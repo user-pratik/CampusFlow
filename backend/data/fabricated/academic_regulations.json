@@ -1,0 +1,95 @@
+{
+  "_comment": "VIT Chennai Academic Calendar & FFCS v4.0 Regulations. Used by the academic agent for regulation-aware answers.",
+
+  "calendar": {
+    "semester": "Winter 2025-2026",
+    "commencement": "2025-12-04",
+    "winter_vacation": { "start": "2025-12-21", "end": "2026-01-04" },
+    "cat1_exams": { "start": "2026-01-24", "end": "2026-01-31" },
+    "vibrance_no_class": { "start": "2026-02-18", "end": "2026-02-21" },
+    "course_withdrawal_window": { "start": "2026-02-16", "end": "2026-02-18" },
+    "cat2_exams": { "start": "2026-03-14", "end": "2026-03-22" },
+    "last_instructional_day_labs": "2026-04-10",
+    "last_instructional_day_theory": "2026-04-17",
+    "fat_exams_labs": { "start": "2026-04-11", "end": "2026-04-17" },
+    "fat_exams_theory_begins": "2026-04-20",
+    "summer_semester_start": "2026-05-11",
+    "fall_2026_27_start": "2026-07-13"
+  },
+
+  "registration": {
+    "min_credits": 16,
+    "max_credits": 27,
+    "average_credits": 23,
+    "graduating_exception": "Can register <16 credits",
+    "low_cgpa_restriction": "CGPA <4.0 restricted to max 16 credits",
+    "add_drop_window": "First 3 instructional days",
+    "withdrawal": "3 days after CAT-I results (Grade 'W'). Cannot withdraw below 16 credits.",
+    "backlogs": "F (Fail) or N (Not Complete/Debarred) requires re-registration",
+    "categories": {
+      "FC": "Foundation Core",
+      "DC": "Discipline Core",
+      "DE": "Discipline Elective",
+      "OE": "Open Elective"
+    }
+  },
+
+  "attendance": {
+    "minimum_required": 75,
+    "unit": "percent",
+    "consequence": "Below 75% = debarred from writing exams for that course",
+    "nine_pointer_exemption": "Students with CGPA >= 9.0 and no backlogs are exempted from 75% rule (dynamically calculated per exam)"
+  },
+
+  "assessment": {
+    "split": "60% CAM (Continuous Assessment) + 40% FAT (Final Assessment Test)",
+    "cam_breakdown": {
+      "cat1": { "weightage_pct": 15, "notes": "Regular exam" },
+      "cat2": { "weightage_pct": 15, "notes": "Open Book exam" },
+      "digital_assignments": { "weightage_pct": 30, "notes": "Assignments throughout semester" }
+    },
+    "passing_criteria": {
+      "theory_fat_minimum": 40,
+      "lab_project_minimum": 50,
+      "overall_minimum": 50,
+      "unit": "percent"
+    },
+    "grades": {
+      "S": { "points": 10, "absolute_min": 90 },
+      "A": { "points": 9, "absolute_min": 80 },
+      "B": { "points": 8, "absolute_min": 70 },
+      "C": { "points": 7, "absolute_min": 60 },
+      "D": { "points": 6, "absolute_min": 55 },
+      "E": { "points": 5, "absolute_min": 50 },
+      "F": { "points": 0, "meaning": "Fail" },
+      "N": { "points": 0, "meaning": "Debarred/Incomplete" }
+    },
+    "grading_system": {
+      "relative": "Used for theory classes with >10 students",
+      "absolute": "Used for labs, projects, soft skills, and classes <=10 students"
+    }
+  },
+
+  "projects_internships": {
+    "industrial_internship": "Mandatory 4-week internship after year 1",
+    "final_project": {
+      "eligibility": "Allowed in pre-final sem if 65% of credits are met",
+      "evaluation": {
+        "review_1": 5,
+        "review_2": 40,
+        "review_3_viva": 50,
+        "attendance": 5
+      }
+    },
+    "hackathon_bonus": "Up to 20 bonus CAM marks for 24+ hour Hackathons/Make-a-thons"
+  },
+
+  "credentials": {
+    "minors_honours": {
+      "additional_credits_required": 18,
+      "minimum_cgpa_in_those_courses": 7.5
+    },
+    "course_substitution": "Failed DE/OE can be substituted with another from same basket (costs a fee)",
+    "grade_improvement": "Can re-register a passed course to improve grade (max 1 per semester, unless graduating)"
+  }
+}

@@ -1,7 +1,19 @@
 {
-  "name": "Ankit",
+  "name": "Pratik Anand",
+  "reg_no": "23BRS1143",
   "branch": "Computer Science",
-  "college": "Example University",
+  "college": "Vellore Institute of Technology",
   "interests": ["AI", "web development", "competitive programming"],
-  "current_focus": "Amazon Hackathon 2026 project"
+  "current_focus": "Amazon Hackathon 2026 project",
+  "year": 3,
+  "semester": 5,
+  "preferred_study_hours": "evening",
+  "wake_up_time": "07:30",
+  "sleep_time": "00:00",
+  "study_style": "pomodoro",
+  "goals": [
+    "Maintain 8.5+ CGPA",
+    "Win Amazon Hackathon 2026",
+    "Get internship at FAANG"
+  ]
 }

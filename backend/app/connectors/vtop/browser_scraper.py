@@ -18,7 +18,8 @@ SESSION_FILE = Path(__file__).resolve().parent.parent.parent.parent / "vtop_sess
 class VTOPBrowserScraper:
     """Headless Playwright scraper using the same AJAX approach as the Android app."""
 
-    def __init__(self):
+    def __init__(self, headless: bool = True):
+        self._headless = headless
         self._playwright = None
         self._browser = None
         self._page: Page | None = None
@@ -38,7 +39,7 @@ class VTOPBrowserScraper:
             return False
 
         self._playwright = await async_playwright().start()
-        self._browser = await self._playwright.chromium.launch(headless=False)
+        self._browser = await self._playwright.chromium.launch(headless=self._headless)
         context = await self._browser.new_context(ignore_https_errors=True)
         await context.add_cookies(cookies)
 

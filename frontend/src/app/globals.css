@@ -2,22 +2,53 @@
 
 :root {
   --background: #FCFCFC;
-  --surface: #F9FAFB;
+  --surface: #F4F5F7;
+  --surface-hover: #EBEDF0;
   --foreground: #111827;
   --secondary: #6B7280;
+  --accent: #4F46E5;
+  --accent-light: #EEF2FF;
   --conflict: #FEF08A;
   --urgent: #DC2626;
+  --success: #059669;
   --border: #E5E7EB;
+  --panel-bg: #FFFFFF;
+  --chat-user: #EEF2FF;
+  --chat-ai: #F9FAFB;
+}
+
+.dark {
+  --background: #0F1117;
+  --surface: #1A1D27;
+  --surface-hover: #242834;
+  --foreground: #F1F3F5;
+  --secondary: #9CA3AF;
+  --accent: #818CF8;
+  --accent-light: #1E1B4B;
+  --conflict: #854D0E;
+  --urgent: #EF4444;
+  --success: #34D399;
+  --border: #2D3142;
+  --panel-bg: #161922;
+  --chat-user: #1E1B4B;
+  --chat-ai: #1A1D27;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
   --color-foreground: var(--foreground);
   --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
   --color-conflict: var(--conflict);
   --color-urgent: var(--urgent);
+  --color-success: var(--success);
   --color-border: var(--border);
+  --color-panel-bg: var(--panel-bg);
+  --color-chat-user: var(--chat-user);
+  --color-chat-ai: var(--chat-ai);
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-newsreader);
 }
@@ -28,7 +59,36 @@ body {
   font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
 }
 
-/* Utility for the serif display face */
 .font-display {
   font-family: var(--font-serif, 'Newsreader', Georgia, serif);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--surface-hover);
+}
+
+/* Chat input focus ring */
+.chat-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
 }

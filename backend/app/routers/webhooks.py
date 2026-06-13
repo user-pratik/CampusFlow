@@ -53,9 +53,9 @@ async def whatsapp_webhook(
         with open(SAMPLE_PAYLOAD_PATH, "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=2)
 
-    # Extract text and group from payload
-    raw_text = payload.get("text", "")
-    source_group = payload.get("group", "unknown")
+    # Extract text and group — handles both Evolution API and test curl formats
+    from app.connectors.whatsapp import extract_text_and_group
+    raw_text, source_group = extract_text_and_group(payload)
 
     if not raw_text:
         return {"status": "ignored", "reason": "empty text"}

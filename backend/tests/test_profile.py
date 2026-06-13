@@ -36,15 +36,18 @@ class TestGetUserProfileHappyPath:
 
 
 class TestGetUserProfileMissingFile:
-    """Test that missing profile file raises FileNotFoundError."""
+    """Test that missing profile file returns default profile."""
 
-    def test_missing_file_raises_file_not_found(self, monkeypatch, tmp_path):
-        """FileNotFoundError raised when user_profile.json does not exist."""
+    def test_missing_file_returns_defaults(self, monkeypatch, tmp_path):
+        """Default profile returned when user_profile.json does not exist."""
         non_existent = tmp_path / "does_not_exist.json"
         monkeypatch.setattr(user_context_module, "USER_PROFILE_PATH", non_existent)
+        monkeypatch.setattr(user_context_module, "USER_PROFILE_EXAMPLE_PATH", tmp_path / "also_missing.json")
 
-        with pytest.raises(FileNotFoundError):
-            get_user_profile()
+        profile = get_user_profile()
+        assert isinstance(profile, dict)
+        assert profile["name"] == "Student"
+        assert profile["college"] == "VIT"
 
 
 class TestGetUserProfileInvalidJSON:

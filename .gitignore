@@ -1,9 +1,7 @@
-# Virtual environments
+# ─── Python ───────────────────────────────────────────────────────────────────
 venv/
 .venv/
 env/
-
-# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -12,24 +10,50 @@ __pycache__/
 dist/
 build/
 
-# Database
+# ─── Node ─────────────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+
+# ─── Database ─────────────────────────────────────────────────────────────────
 *.db
 
-# IDE
+# ─── Environment / Secrets ────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+!.env.example
+
+# ─── VTOP Session (contains auth cookies — sensitive) ─────────────────────────
+backend/vtop_session.json
+backend/vtop_login.html
+
+# ─── WhatsApp QR (ephemeral) ──────────────────────────────────────────────────
+backend/whatsapp_qr.html
+
+# ─── Agent Data (runtime state — regenerated automatically) ───────────────────
+backend/data/actions/*.json
+backend/data/memory/*.json
+!backend/data/**/.gitkeep
+
+# ─── User Profile (personal data) ────────────────────────────────────────────
+backend/user_profile.json
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 
-# OS
+# ─── OS ───────────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# Environment variables
-.env
-
-# Test / coverage
+# ─── Test / Coverage ──────────────────────────────────────────────────────────
 .pytest_cache/
 htmlcov/
 .coverage
+.nyc_output/
 
-# Saved payloads
+# ─── Misc ─────────────────────────────────────────────────────────────────────
 sample_payload.json
+*.log

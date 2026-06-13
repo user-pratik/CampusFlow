@@ -1,0 +1,28 @@
+services:
+  evolution-api:
+    image: atendai/evolution-api:v1.8.0
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_URL=http://localhost:8080
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=campusflow-secret
+      - QRCODE_LIMIT=6
+      - WEBHOOK_GLOBAL_ENABLED=true
+      - WEBHOOK_GLOBAL_URL=${EVOLUTION_WEBHOOK_URL:-}
+      - WEBHOOK_EVENTS_MESSAGES_UPSERT=true
+      - WEBHOOK_EVENTS_MESSAGES_UPDATE=false
+      - WEBHOOK_EVENTS_QRCODE_UPDATED=false
+      - WEBHOOK_EVENTS_CONNECTION_UPDATE=false
+      - DATABASE_ENABLED=false
+      - REDIS_ENABLED=false
+      - LOG_LEVEL=VERBOSE
+    volumes:
+      - evolution_data:/evolution/instances
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    restart: unless-stopped
+
+volumes:
+  evolution_data:
