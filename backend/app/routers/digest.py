@@ -1,4 +1,4 @@
-"""Digest router — latest digest retrieval and trigger stub."""
+"""Digest router — latest digest retrieval and manual generation trigger."""
 
 from fastapi import APIRouter, Depends
 from sqlmodel import select
@@ -6,8 +6,11 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.database import get_session
 from app.models import Digest
+from app.agents.digest_agent import DigestAgent
 
 router = APIRouter()
+
+_digest_agent = DigestAgent()
 
 
 @router.get("/digest/latest", response_model=dict | Digest)
@@ -22,7 +25,22 @@ async def get_latest_digest(session: AsyncSession = Depends(get_session)):
     return digest
 
 
-@router.post("/digest/trigger")
+@router.post("/digest/trigger", response_model=Digest)
 async def trigger_digest():
-    """Stub endpoint for digest generation trigger."""
-    return {"status": "not implemented"}
+    """Execute DigestAgent immediately and return the new digest.
+
+    This is the hackathon demo trigger — runs synchronously so the
+    frontend gets the freshly generated briefing in the response.
+    """
+    result = await _digest_agent.execute({})
+
+    # Fetch the freshly created digest from DB to return a proper model instance
+    from app.database import async_session_maker
+
+    async with async_session_maker() as session:
+        db_result = await session.exec(
+            select(Digest).where(Digest.id == result["digest_id"])
+        )
+        digest = db_result.first()
+
+    return digest

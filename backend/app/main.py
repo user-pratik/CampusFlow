@@ -1,14 +1,22 @@
 """CampusFlow FastAPI application entry point.
 
-Sets up CORS, lifespan (DB init), health endpoint, and router mounting.
+Sets up CORS, lifespan (DB init + scheduler), health endpoint, and router mounting.
 """
 
+import logging
 from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
+
+load_dotenv(override=True)  # Ensure env vars are available in reloaded worker
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(name)s - %(message)s")
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
+from app.scheduler import start_scheduler, stop_scheduler
 from app.routers import profile, notices, tasks, digest, webhooks
 
 # Import models to ensure they are registered with SQLModel metadata before init_db runs
@@ -17,9 +25,11 @@ import app.models  # noqa: F401
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan: initialize database tables on startup."""
+    """Application lifespan: initialize database tables and start scheduler on startup."""
     await init_db()
+    start_scheduler()
     yield
+    stop_scheduler()
 
 
 app = FastAPI(title="CampusFlow", lifespan=lifespan)

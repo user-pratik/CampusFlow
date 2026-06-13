@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()  # Load .env before anything else
+
 import uvicorn
 
 if __name__ == "__main__":
