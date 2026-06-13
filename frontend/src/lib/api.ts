@@ -77,3 +77,76 @@ export async function triggerDigest(): Promise<{ status: string }> {
   if (!res.ok) throw new Error("Failed to trigger digest");
   return res.json();
 }
+
+// ─── Phase 6: Academic Data Types ────────────────────────────────────────────
+
+export interface AttendanceRecord {
+  id: number;
+  course_code: string;
+  course_title: string;
+  percentage: number;
+  attended: number;
+  total: number;
+  updated_at: string;
+}
+
+export interface CourseMarkRecord {
+  id: number;
+  course_code: string;
+  course_title: string;
+  mark_title: string;
+  max_mark: number | null;
+  weightage_pct: number | null;
+  score: number | null;
+  weightage_mark: number | null;
+  status: string | null;
+  updated_at: string;
+}
+
+export interface AcademicProfileData {
+  id: number;
+  cgpa: number;
+  total_credits: number;
+  overall_attendance: number | null;
+  semester_name: string | null;
+  updated_at: string;
+}
+
+// ─── Phase 6: Academic Fetchers ──────────────────────────────────────────────
+
+export async function fetchAttendance(): Promise<AttendanceRecord[]> {
+  const res = await fetch(`${BASE}/api/academic/attendance`, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function fetchMarks(): Promise<CourseMarkRecord[]> {
+  const res = await fetch(`${BASE}/api/academic/marks`, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function fetchAcademicProfile(): Promise<AcademicProfileData | null> {
+  const res = await fetch(`${BASE}/api/academic/profile`, { cache: "no-store" });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data || !("cgpa" in data)) return null;
+  return data as AcademicProfileData;
+}
+
+export async function triggerVtopSync(semesterId?: string): Promise<{ status: string; summary?: Record<string, unknown> }> {
+  const res = await fetch(`${BASE}/api/academic/sync`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ semester_id: semesterId || null }),
+  });
+  if (!res.ok) throw new Error("Failed to trigger VTOP sync");
+  return res.json();
+}
+
+export async function fetchSemesters(): Promise<Record<string, string>> {
+  const res = await fetch(`${BASE}/api/academic/semesters`, { cache: "no-store" });
+  if (!res.ok) return {};
+  const data = await res.json();
+  return data.semesters || {};
+}

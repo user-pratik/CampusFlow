@@ -1,5 +1,6 @@
 import ConflictAlert from "@/components/ConflictAlert";
 import MorningBriefing from "@/components/MorningBriefing";
+import AcademicDashboard from "@/components/AcademicDashboard";
 import CampusFeed from "@/components/CampusFeed";
 
 export default function Home() {
@@ -7,6 +8,10 @@ export default function Home() {
     <main className="flex-1">
       <ConflictAlert />
       <MorningBriefing />
+      <div className="max-w-2xl mx-auto px-6">
+        <hr className="border-border" />
+      </div>
+      <AcademicDashboard />
       <div className="max-w-2xl mx-auto px-6">
         <hr className="border-border" />
       </div>
