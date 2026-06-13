@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+aiosqlite
+pydantic
+httpx
+pytest
+pytest-asyncio
+hypothesis
