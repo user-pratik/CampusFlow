@@ -326,7 +326,7 @@ class ConnectorAgent(BaseAgent):
                 {"label": "Draft reply", "type": "reply"},
                 {"label": "Mark as read", "type": "reply"},
             ]
-        elif any(w in q for w in ["calendar", "schedule", "exam", "deadline", "upcoming", "due", "timetable", "class"]):
+        elif any(w in q for w in ["calendar", "schedule", "exam", "deadline", "upcoming", "due", "timetable", "class", "today", "tomorrow", "tonight"]):
             return "calendar", [
                 {"label": "Show calendar", "type": "navigate", "payload": "calendar"},
                 {"label": "Set reminder", "type": "reply"},
@@ -343,9 +343,18 @@ class ConnectorAgent(BaseAgent):
         q = message.lower()
 
         # Calendar widget data
-        if any(w in q for w in ["calendar", "schedule", "exam", "deadline", "upcoming", "due", "week"]):
+        if any(w in q for w in ["calendar", "schedule", "exam", "deadline", "upcoming", "due", "week", "today", "tomorrow", "tonight"]):
             events = self._calendar_data.get("events", [])
-            sorted_events = sorted(events, key=lambda e: e["date"])
+            today_str = datetime.now().strftime("%Y-%m-%d")
+
+            # If asking about "today", filter to today's events
+            if "today" in q or "tonight" in q:
+                filtered = [e for e in events if e["date"] == today_str]
+                # If no events today, still return the list (empty widget won't render)
+                sorted_events = sorted(filtered, key=lambda e: e["start_time"])
+            else:
+                sorted_events = sorted(events, key=lambda e: e["date"])
+
             return {
                 "calendar_events": [
                     {

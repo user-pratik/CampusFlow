@@ -84,7 +84,7 @@ function extractWidgetData(response: ChatApiResponse): WidgetData | undefined {
   }
 
   // Calendar widget — from ConnectorAgent when showing calendar
-  if (intent === "connector" && response.panel === "calendar") {
+  if (response.panel === "calendar") {
     const calendarEvents = panelData?.calendar_events as Array<Record<string, unknown>> | undefined;
     if (calendarEvents && calendarEvents.length > 0) {
       return {
