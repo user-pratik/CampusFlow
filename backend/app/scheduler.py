@@ -33,7 +33,17 @@ async def _generate_daily_digest():
 
 
 async def _poll_vtop():
-    """Scheduled job: scrape VTOP portal for fresh academic data."""
+    """Scheduled job: scrape VTOP portal for fresh academic data.
+
+    Skips if no session file exists (avoids launching browsers pointlessly).
+    """
+    from pathlib import Path
+
+    session_file = Path(__file__).resolve().parent.parent / "vtop_session.json"
+    if not session_file.exists():
+        logger.debug("VTOP poll skipped — no session file.")
+        return
+
     from app.connectors.vtop.connector import VTOPConnector
 
     connector = VTOPConnector()

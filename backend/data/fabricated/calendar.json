@@ -1,0 +1,200 @@
+{
+  "_comment": "Fabricated calendar data simulating real student schedule at VIT.",
+
+  "events": [
+    {
+      "id": 1,
+      "title": "CAT 2 - Compiler Design (BCSE307L)",
+      "date": "2026-06-25",
+      "start_time": "09:00",
+      "end_time": "10:30",
+      "location": "SJT 101",
+      "type": "exam",
+      "course_code": "BCSE307L",
+      "notes": "Open book - handwritten notes only. Syllabus: Units 3-4."
+    },
+    {
+      "id": 2,
+      "title": "Embedded Systems Lab Exam",
+      "date": "2026-06-20",
+      "start_time": "11:30",
+      "end_time": "13:30",
+      "location": "Lab 3, SJT",
+      "type": "exam",
+      "course_code": "BCSE305L",
+      "notes": "Batch 2. All 10 programs + viva. Bring lab record."
+    },
+    {
+      "id": 3,
+      "title": "Probability Assignment 4 Due",
+      "date": "2026-06-16",
+      "start_time": "23:59",
+      "end_time": "23:59",
+      "location": "Moodle (Online)",
+      "type": "deadline",
+      "course_code": "BMAT301L",
+      "notes": "Hypothesis Testing problems. No late submissions."
+    },
+    {
+      "id": 4,
+      "title": "OS Lab 5 Submission",
+      "date": "2026-06-28",
+      "start_time": "23:59",
+      "end_time": "23:59",
+      "location": "VIT Moodle",
+      "type": "deadline",
+      "course_code": "BCSE302L",
+      "notes": "Page Replacement: FIFO, LRU, Optimal. Viva during next lab."
+    },
+    {
+      "id": 5,
+      "title": "DBMS Project Phase 2 Due",
+      "date": "2026-06-22",
+      "start_time": "23:59",
+      "end_time": "23:59",
+      "location": "Moodle",
+      "type": "deadline",
+      "course_code": "BCSE304L",
+      "notes": "ER diagram + normalization (3NF). Groups of 3."
+    },
+    {
+      "id": 6,
+      "title": "Amazon Hackathon - Round 2 Submission",
+      "date": "2026-06-18",
+      "start_time": "23:59",
+      "end_time": "23:59",
+      "location": "hackathon.amazon.com",
+      "type": "deadline",
+      "course_code": null,
+      "notes": "Demo video, architecture doc, GitHub repo, impact analysis."
+    },
+    {
+      "id": 7,
+      "title": "ML Study Group - Paper Discussion",
+      "date": "2026-06-15",
+      "start_time": "16:00",
+      "end_time": "17:30",
+      "location": "LH-301",
+      "type": "meeting",
+      "course_code": null,
+      "notes": "Paper: 'Attention Is All You Need'. Bring annotated copy."
+    },
+    {
+      "id": 8,
+      "title": "SIH Team Meeting",
+      "date": "2026-06-15",
+      "start_time": "18:00",
+      "end_time": "19:30",
+      "location": "Google Meet",
+      "type": "meeting",
+      "course_code": null,
+      "notes": "Discuss problem statement, assign roles, plan Sprint 1."
+    },
+    {
+      "id": 9,
+      "title": "Microsoft Registration Deadline",
+      "date": "2026-06-25",
+      "start_time": "23:59",
+      "end_time": "23:59",
+      "location": "Superset Portal",
+      "type": "deadline",
+      "course_code": null,
+      "notes": "CGPA >= 8.0 required. SDE & PM intern roles."
+    },
+    {
+      "id": 10,
+      "title": "Microsoft Online Coding Test",
+      "date": "2026-06-28",
+      "start_time": "14:00",
+      "end_time": "16:00",
+      "location": "Online (HackerRank)",
+      "type": "exam",
+      "course_code": null,
+      "notes": "2 hours. DSA + problem solving. Practice graphs and DP."
+    },
+    {
+      "id": 11,
+      "title": "SIH Orientation Webinar",
+      "date": "2026-06-20",
+      "start_time": "17:00",
+      "end_time": "18:00",
+      "location": "Zoom (link TBA)",
+      "type": "meeting",
+      "course_code": null,
+      "notes": "Mandatory for all registered teams."
+    },
+    {
+      "id": 12,
+      "title": "End Semester Exams Begin",
+      "date": "2026-07-01",
+      "start_time": "09:00",
+      "end_time": "12:00",
+      "location": "TBD (Check VTOP)",
+      "type": "exam",
+      "course_code": null,
+      "notes": "Hall ticket download from June 25th."
+    },
+    {
+      "id": 13,
+      "title": "Hostel Room Allocation Opens",
+      "date": "2026-06-30",
+      "start_time": "10:00",
+      "end_time": "23:59",
+      "location": "VTOP",
+      "type": "deadline",
+      "course_code": null,
+      "notes": "Priority based on CGPA. Select early for better rooms."
+    },
+    {
+      "id": 14,
+      "title": "Codeforces Round #950",
+      "date": "2026-06-14",
+      "start_time": "20:30",
+      "end_time": "22:30",
+      "location": "Online",
+      "type": "event",
+      "course_code": null,
+      "notes": "Expected: graphs and DP problems. Virtual contest with CP group."
+    },
+    {
+      "id": 15,
+      "title": "Prof. Deepa M - Office Hours",
+      "date": "2026-06-17",
+      "start_time": "15:00",
+      "end_time": "17:00",
+      "location": "SJT 512",
+      "type": "meeting",
+      "course_code": "BMAT301L",
+      "notes": "Discuss CAT 2 performance and FAT prep strategy."
+    }
+  ],
+
+  "timetable": {
+    "Monday": [
+      { "time": "08:00-08:50", "course_code": "BCSE307L", "course_title": "Compiler Design", "room": "SJT 101", "type": "Theory", "faculty": "Prof. Anitha S" },
+      { "time": "09:00-09:50", "course_code": "BCSE302L", "course_title": "Operating Systems", "room": "SJT 205", "type": "Theory", "faculty": "Prof. Kumar N" },
+      { "time": "10:00-10:50", "course_code": "BCSE305L", "course_title": "Embedded Systems", "room": "SJT 303", "type": "Theory", "faculty": "Prof. Venkatesh R" },
+      { "time": "14:00-15:50", "course_code": "BCSE304L", "course_title": "DBMS", "room": "Lab 3", "type": "Lab", "faculty": "Prof. Lakshmi V" }
+    ],
+    "Tuesday": [
+      { "time": "10:00-10:50", "course_code": "BMAT301L", "course_title": "Probability & Statistics", "room": "SJT 302", "type": "Theory", "faculty": "Prof. Deepa M" },
+      { "time": "11:00-11:50", "course_code": "BCSE309L", "course_title": "Computer Networks", "room": "SJT 401", "type": "Theory", "faculty": "Prof. Rajan P" },
+      { "time": "14:00-14:50", "course_code": "BHUM301L", "course_title": "Ethics in Engineering", "room": "SJT 102", "type": "Theory", "faculty": "Prof. Meenakshi K" }
+    ],
+    "Wednesday": [
+      { "time": "08:00-08:50", "course_code": "BCSE307L", "course_title": "Compiler Design", "room": "SJT 101", "type": "Theory", "faculty": "Prof. Anitha S" },
+      { "time": "09:00-09:50", "course_code": "BCSE302L", "course_title": "Operating Systems", "room": "SJT 205", "type": "Theory", "faculty": "Prof. Kumar N" },
+      { "time": "11:00-12:50", "course_code": "BCSE309L", "course_title": "Computer Networks", "room": "Lab 5", "type": "Lab", "faculty": "Prof. Rajan P" }
+    ],
+    "Thursday": [
+      { "time": "10:00-10:50", "course_code": "BMAT301L", "course_title": "Probability & Statistics", "room": "SJT 302", "type": "Theory", "faculty": "Prof. Deepa M" },
+      { "time": "11:00-11:50", "course_code": "BCSE305L", "course_title": "Embedded Systems", "room": "SJT 303", "type": "Theory", "faculty": "Prof. Venkatesh R" },
+      { "time": "14:00-14:50", "course_code": "BHUM301L", "course_title": "Ethics in Engineering", "room": "SJT 102", "type": "Theory", "faculty": "Prof. Meenakshi K" }
+    ],
+    "Friday": [
+      { "time": "08:00-08:50", "course_code": "BCSE307L", "course_title": "Compiler Design", "room": "SJT 101", "type": "Theory", "faculty": "Prof. Anitha S" },
+      { "time": "10:00-10:50", "course_code": "BMAT301L", "course_title": "Probability & Statistics", "room": "SJT 302", "type": "Theory", "faculty": "Prof. Deepa M" },
+      { "time": "14:00-15:50", "course_code": "BCSE305L", "course_title": "Embedded Systems", "room": "Lab 2", "type": "Lab", "faculty": "Prof. Venkatesh R" }
+    ]
+  }
+}

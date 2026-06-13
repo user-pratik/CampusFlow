@@ -1,0 +1,79 @@
+{
+  "_comment": "Fabricated data for frontend panels. The chat AI now uses backend agentic system with richer data.",
+  
+  "whatsappMessages": [
+    { "id": 1, "group": "BCSE305L - Embedded Systems", "sender": "Prof. Venkatesh R", "text": "Students, the lab exam for Embedded Systems is scheduled for June 20th. You need to prepare all 10 lab programs. Viva will cover ARM architecture and interfacing.", "timestamp": "2026-06-14T09:15:00Z", "type": "academic", "sender_type": "faculty" },
+    { "id": 2, "group": "BCSE307L - Compiler Design", "sender": "Prof. Anitha S", "text": "CAT 2 syllabus: Syntax-directed translation, intermediate code generation, and code optimization (Units 3-4). Open book — only handwritten notes allowed.", "timestamp": "2026-06-14T08:00:00Z", "type": "academic", "sender_type": "faculty" },
+    { "id": 3, "group": "BMAT301L - Probability & Statistics", "sender": "Prof. Deepa M", "text": "Reminder: Assignment 4 on Hypothesis Testing is due this Friday (June 16th) by 11:59 PM. Submit on Moodle.", "timestamp": "2026-06-14T07:45:00Z", "type": "academic", "sender_type": "faculty" },
+    { "id": 4, "group": "BCSE305L - Embedded Systems", "sender": "Priya D", "text": "Study group for Embedded lab exam? I'm free tomorrow 6-8 PM. We can meet at the library and go through all programs together.", "timestamp": "2026-06-14T20:00:00Z", "type": "general", "sender_type": "student" },
+    { "id": 5, "group": "CSE 2026 - Section A", "sender": "Class Rep Priya", "text": "Updated timetable for next week: DBMS lab shifted from Thursday to Friday 2-4 PM due to faculty conference.", "timestamp": "2026-06-14T13:30:00Z", "type": "academic", "sender_type": "student" },
+    { "id": 6, "group": "BCSE302L - Operating Systems", "sender": "Prof. Kumar N", "text": "Lab 5 (Page Replacement Algorithms) deadline extended to June 28th. Implement FIFO, LRU, and Optimal.", "timestamp": "2026-06-13T10:15:00Z", "type": "academic", "sender_type": "faculty" },
+    { "id": 7, "group": "BCSE309L - Computer Networks", "sender": "Prof. Rajan P", "text": "Tomorrow's class will cover Transport Layer protocols (TCP/UDP). Read Kurose Chapter 3 sections 3.4-3.7. Quiz at start of class.", "timestamp": "2026-06-14T17:00:00Z", "type": "academic", "sender_type": "faculty" },
+    { "id": 8, "group": "Placement Cell - CSE", "sender": "TPO Office", "text": "Microsoft visiting campus on July 5th. Eligible: CGPA > 8.0, no active backlogs. Register on Superset by June 25th.", "timestamp": "2026-06-10T11:00:00Z", "type": "placement", "sender_type": "admin" },
+    { "id": 9, "group": "Hackathon Club VIT", "sender": "Rahul M", "text": "Team registrations open for Smart India Hackathon 2026. Deadline: June 20th. DM me if you need a team.", "timestamp": "2026-06-12T18:00:00Z", "type": "event", "sender_type": "student" },
+    { "id": 10, "group": "ML Study Group", "sender": "Sneha R", "text": "This week's paper: 'Attention Is All You Need'. Meeting Sunday 4 PM in LH-301.", "timestamp": "2026-06-13T22:00:00Z", "type": "event", "sender_type": "student" },
+    { "id": 11, "group": "Competitive Programming VIT", "sender": "Vikram S", "text": "Codeforces Round #950 tonight at 8:30 PM IST. Good problems on graphs and DP expected.", "timestamp": "2026-06-14T16:00:00Z", "type": "event", "sender_type": "student" },
+    { "id": 12, "group": "BCSE304L - DBMS", "sender": "Prof. Lakshmi V", "text": "Project Phase 2 submissions: ER diagram + normalization (up to 3NF) due June 22nd. Groups of 3 max.", "timestamp": "2026-06-14T12:00:00Z", "type": "academic", "sender_type": "faculty" }
+  ],
+
+  "emails": [
+    { "id": 1, "from": "vtop-noreply@vit.ac.in", "subject": "End Semester Exam Schedule Published", "preview": "End semester exam schedule for Fall 2026 published. First exam: July 1st. Download hall ticket from June 25th.", "timestamp": "2026-06-14T06:00:00Z", "read": false, "category": "academic" },
+    { "id": 2, "from": "placements@vit.ac.in", "subject": "Microsoft Campus Drive - July 5th | SDE & PM Intern", "preview": "Microsoft campus drive July 5th. CGPA >= 8.0 required. Register on Superset by June 25th.", "timestamp": "2026-06-12T10:00:00Z", "read": true, "category": "placement" },
+    { "id": 3, "from": "library@vit.ac.in", "subject": "Overdue Book Reminder - CLRS", "preview": "CLRS book overdue by 4 days. Fine: Rs. 20. Return to Main Library Counter 2.", "timestamp": "2026-06-14T08:00:00Z", "read": false, "category": "general" },
+    { "id": 4, "from": "amazonhackathon@amazon.com", "subject": "Round 2 Submission Reminder - Due June 18th", "preview": "Amazon Hackathon Round 2 due June 18th. Need: demo video, architecture doc, GitHub repo, impact analysis.", "timestamp": "2026-06-13T12:00:00Z", "read": false, "category": "hackathon" },
+    { "id": 5, "from": "bcse305l-faculty@vit.ac.in", "subject": "Embedded Systems - Lab Exam Schedule", "preview": "Lab exam June 20th. Batch 2: 11:30 AM. All 10 programs + viva on ARM, GPIO, timers, interrupts.", "timestamp": "2026-06-13T09:00:00Z", "read": true, "category": "academic" },
+    { "id": 6, "from": "bmat301l-faculty@vit.ac.in", "subject": "Probability - CAT 2 Results & FAT Prep Guide", "preview": "CAT 2 results out. Class average 28/50. FAT focus: Hypothesis Testing, Regression, ANOVA.", "timestamp": "2026-06-12T16:30:00Z", "read": false, "category": "academic" },
+    { "id": 7, "from": "sih2026@gov.in", "subject": "SIH 2026 - Team Registration Confirmed", "preview": "Team 'Neural Knights' registered for SIH 2026. Problem statements by June 22nd.", "timestamp": "2026-06-10T14:00:00Z", "read": true, "category": "event" },
+    { "id": 8, "from": "no-reply@coursera.org", "subject": "Certificate Ready: Deep Learning Specialization", "preview": "Deep Learning Specialization certificate ready. Share on LinkedIn.", "timestamp": "2026-06-09T16:00:00Z", "read": true, "category": "general" }
+  ],
+
+  "calendar": [
+    { "id": 1, "title": "Probability Assignment 4 Due", "date": "2026-06-16", "time": "23:59", "location": "Moodle", "type": "deadline", "course": "BMAT301L" },
+    { "id": 2, "title": "Amazon Hackathon Round 2", "date": "2026-06-18", "time": "23:59", "location": "hackathon.amazon.com", "type": "deadline", "course": null },
+    { "id": 3, "title": "Embedded Systems Lab Exam", "date": "2026-06-20", "time": "11:30", "location": "Lab 3, SJT", "type": "exam", "course": "BCSE305L" },
+    { "id": 4, "title": "SIH Orientation Webinar", "date": "2026-06-20", "time": "17:00", "location": "Zoom", "type": "meeting", "course": null },
+    { "id": 5, "title": "DBMS Project Phase 2 Due", "date": "2026-06-22", "time": "23:59", "location": "Moodle", "type": "deadline", "course": "BCSE304L" },
+    { "id": 6, "title": "CAT 2 - Compiler Design", "date": "2026-06-25", "time": "09:00", "location": "SJT 101", "type": "exam", "course": "BCSE307L" },
+    { "id": 7, "title": "Microsoft Registration Deadline", "date": "2026-06-25", "time": "23:59", "location": "Superset Portal", "type": "deadline", "course": null },
+    { "id": 8, "title": "OS Lab 5 Submission", "date": "2026-06-28", "time": "23:59", "location": "Moodle", "type": "deadline", "course": "BCSE302L" },
+    { "id": 9, "title": "Microsoft Online Coding Test", "date": "2026-06-28", "time": "14:00", "location": "HackerRank", "type": "exam", "course": null },
+    { "id": 10, "title": "Hostel Room Allocation", "date": "2026-06-30", "time": "10:00", "location": "VTOP", "type": "deadline", "course": null },
+    { "id": 11, "title": "End Semester Exams Begin", "date": "2026-07-01", "time": "09:00", "location": "TBD", "type": "exam", "course": null }
+  ],
+
+  "suggestedGroups": [
+    { "name": "Competitive Programming - VIT", "members": 342, "reason": "Based on your interest in competitive programming" },
+    { "name": "AI/ML Research Group", "members": 128, "reason": "Matches your branch and AI interest" },
+    { "name": "Open Source Contributors VIT", "members": 89, "reason": "Based on your web development interest" },
+    { "name": "LeetCode Daily Challenge", "members": 256, "reason": "Popular among CSE students preparing for placements" }
+  ],
+
+  "timetable": {
+    "Monday": [
+      { "time": "08:00-08:50", "course": "BCSE307L - Compiler Design", "room": "SJT 101", "type": "Theory" },
+      { "time": "09:00-09:50", "course": "BCSE302L - Operating Systems", "room": "SJT 205", "type": "Theory" },
+      { "time": "10:00-10:50", "course": "BCSE305L - Embedded Systems", "room": "SJT 303", "type": "Theory" },
+      { "time": "14:00-15:50", "course": "BCSE304L - DBMS", "room": "Lab 3", "type": "Lab" }
+    ],
+    "Tuesday": [
+      { "time": "10:00-10:50", "course": "BMAT301L - Probability & Statistics", "room": "SJT 302", "type": "Theory" },
+      { "time": "11:00-11:50", "course": "BCSE309L - Computer Networks", "room": "SJT 401", "type": "Theory" },
+      { "time": "14:00-14:50", "course": "BHUM301L - Ethics in Engineering", "room": "SJT 102", "type": "Theory" }
+    ],
+    "Wednesday": [
+      { "time": "08:00-08:50", "course": "BCSE307L - Compiler Design", "room": "SJT 101", "type": "Theory" },
+      { "time": "09:00-09:50", "course": "BCSE302L - Operating Systems", "room": "SJT 205", "type": "Theory" },
+      { "time": "11:00-12:50", "course": "BCSE309L - Computer Networks", "room": "Lab 5", "type": "Lab" }
+    ],
+    "Thursday": [
+      { "time": "10:00-10:50", "course": "BMAT301L - Probability & Statistics", "room": "SJT 302", "type": "Theory" },
+      { "time": "11:00-11:50", "course": "BCSE305L - Embedded Systems", "room": "SJT 303", "type": "Theory" },
+      { "time": "14:00-14:50", "course": "BHUM301L - Ethics in Engineering", "room": "SJT 102", "type": "Theory" }
+    ],
+    "Friday": [
+      { "time": "08:00-08:50", "course": "BCSE307L - Compiler Design", "room": "SJT 101", "type": "Theory" },
+      { "time": "10:00-10:50", "course": "BMAT301L - Probability & Statistics", "room": "SJT 302", "type": "Theory" },
+      { "time": "14:00-15:50", "course": "BCSE305L - Embedded Systems", "room": "Lab 2", "type": "Lab" }
+    ]
+  }
+}

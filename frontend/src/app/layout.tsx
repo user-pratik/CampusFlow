@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const newsreader = Newsreader({
 
 export const metadata: Metadata = {
   title: "CampusFlow",
-  description: "Your quiet command center for campus life.",
+  description: "Your AI command center for campus life.",
 };
 
 export default function RootLayout({
@@ -27,10 +28,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

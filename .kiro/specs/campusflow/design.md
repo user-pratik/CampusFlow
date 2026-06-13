@@ -176,9 +176,9 @@ class Digest(SQLModel, table=True):
 
 ```json
 {
-  "name": "Ankit",
+  "name": "Pratik",
   "branch": "Computer Science",
-  "college": "Example University",
+  "college": "Vellore Institute of Technology",
   "interests": ["AI", "web development", "competitive programming"],
   "current_focus": "Amazon Hackathon 2026 project"
 }

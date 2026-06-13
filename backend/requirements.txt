@@ -15,3 +15,5 @@ cryptography
 pytest
 pytest-asyncio
 hypothesis
+pyngrok
+playwright

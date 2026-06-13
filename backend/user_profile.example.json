@@ -1,0 +1,18 @@
+{
+  "name": "Your Name",
+  "reg_no": "23XXXNNNN",
+  "branch": "Your Branch",
+  "college": "Vellore Institute of Technology",
+  "interests": ["AI", "web development"],
+  "current_focus": "Academics",
+  "year": 2,
+  "semester": 3,
+  "preferred_study_hours": "evening",
+  "wake_up_time": "07:30",
+  "sleep_time": "00:00",
+  "study_style": "pomodoro",
+  "goals": [
+    "Maintain good CGPA",
+    "Build interesting projects"
+  ]
+}

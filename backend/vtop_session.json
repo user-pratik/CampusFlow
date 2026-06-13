@@ -1,8 +1,18 @@
 {
   "cookies": [
     {
+      "name": "_GRECAPTCHA",
+      "value": "09AKhCRwjMs57obES-GpsX1J1GB9AVj14AGKUUWmVcZ-pAhxo5KKQk8qYl_doDShbkfSDfsXBVsxX0zeH2CY1KI_0",
+      "domain": "www.google.com",
+      "path": "/recaptcha",
+      "expires": 1796912618.734963,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
       "name": "JSESSIONID",
-      "value": "B6504BA071B52736B0C4715D8EE11F6F",
+      "value": "500D5D663C6AA00709592CE05DD9E5D5",
       "domain": "vtopcc.vit.ac.in",
       "path": "/vtop",
       "expires": -1,
@@ -12,7 +22,7 @@
     },
     {
       "name": "SERVERID",
-      "value": "vt1",
+      "value": "vt2",
       "domain": "vtopcc.vit.ac.in",
       "path": "/",
       "expires": -1,
@@ -22,10 +32,10 @@
     },
     {
       "name": "cookiesession1",
-      "value": "678A8C3216F09B1A6E710DEB42BA123A",
+      "value": "678A8C32FE29F76230767056BD00577E",
       "domain": "vtopcc.vit.ac.in",
       "path": "/",
-      "expires": 1812891345.226516,
+      "expires": 1812896575.382956,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"
