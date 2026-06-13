@@ -1,0 +1,35 @@
+{
+  "cookies": [
+    {
+      "name": "JSESSIONID",
+      "value": "B6504BA071B52736B0C4715D8EE11F6F",
+      "domain": "vtopcc.vit.ac.in",
+      "path": "/vtop",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "SERVERID",
+      "value": "vt1",
+      "domain": "vtopcc.vit.ac.in",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "cookiesession1",
+      "value": "678A8C3216F09B1A6E710DEB42BA123A",
+      "domain": "vtopcc.vit.ac.in",
+      "path": "/",
+      "expires": 1812891345.226516,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "url": "https://vtopcc.vit.ac.in/vtop/content"
+}

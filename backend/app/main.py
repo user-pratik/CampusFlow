@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
 from app.scheduler import start_scheduler, stop_scheduler
-from app.routers import profile, notices, tasks, digest, webhooks
+from app.routers import profile, notices, tasks, digest, webhooks, academic
 
 # Import models to ensure they are registered with SQLModel metadata before init_db runs
 import app.models  # noqa: F401
@@ -55,3 +55,4 @@ app.include_router(notices.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
 app.include_router(digest.router, prefix="/api")
 app.include_router(webhooks.router, prefix="/api")
+app.include_router(academic.router, prefix="/api")
