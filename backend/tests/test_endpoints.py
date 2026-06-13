@@ -42,7 +42,11 @@ async def test_get_digest_latest_no_data(client):
 
 @pytest.mark.asyncio
 async def test_post_digest_trigger(client):
-    """POST /api/digest/trigger returns 200 with not implemented status."""
+    """POST /api/digest/trigger returns 200 with a generated digest."""
     response = await client.post("/api/digest/trigger")
     assert response.status_code == 200
-    assert response.json() == {"status": "not implemented"}
+    data = response.json()
+    # DigestAgent returns a Digest record with content and generated_at
+    assert "content" in data
+    assert "generated_at" in data
+    assert len(data["content"]) > 0

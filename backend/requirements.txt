@@ -4,6 +4,9 @@ sqlmodel
 aiosqlite
 pydantic
 httpx
+groq
+python-dotenv
+apscheduler
 pytest
 pytest-asyncio
 hypothesis
