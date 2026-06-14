@@ -99,3 +99,117 @@ async def _run_pipeline(raw_text: str, source_group: str) -> None:
         )
     except Exception:
         logger.exception("Pipeline failed for message: %s...", raw_text[:80])
+
+
+@router.post("/webhooks/whatsapp-n8n")
+async def receive_whatsapp_n8n(request: Request):
+    """Receives WhatsApp messages from n8n/UltraMsg pipeline."""
+    import json
+    import hashlib
+    from datetime import datetime
+    from sqlmodel import Session, select as sync_select
+    from sqlalchemy import create_engine as sync_create_engine
+
+    from app.connectors.gmail.email_classifier import classify_email
+    from app.models import EmailNotification
+
+    body = await request.body()
+    body_str = body.decode("utf-8").strip()
+
+    if not body_str:
+        return {"status": "error", "detail": "empty body"}
+
+    try:
+        payload = json.loads(body_str)
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
+    message = payload.get("message", "")
+    source = payload.get("source", "WhatsApp Group").lstrip("=")
+    sender = payload.get("sender", "").lstrip("=")
+    timestamp = payload.get("timestamp", None)
+
+    logger.info("DEBUG whatsapp-n8n: message=%s, source=%s, sender=%s", message[:30], source, sender)
+
+    if not message:
+        return {"status": "skipped", "reason": "empty message"}
+
+    result = classify_email(subject=message[:100], sender=source, body=message)
+
+    unique_str = f"{sender}_{timestamp}_{message[:50]}"
+    msg_id = f"wa_{hashlib.md5(unique_str.encode()).hexdigest()}"
+
+    # Use sync session for simplicity
+    from pathlib import Path
+    db_path = Path(__file__).resolve().parent.parent.parent / "campusflow.db"
+    engine = sync_create_engine(f"sqlite:///{db_path}")
+
+    with Session(engine) as db:
+        existing = db.exec(
+            sync_select(EmailNotification).where(EmailNotification.gmail_msg_id == msg_id)
+        ).first()
+
+        if existing:
+            return {"status": "duplicate", "skipped": True}
+
+        received_at = datetime.utcnow()
+        if timestamp:
+            try:
+                received_at = datetime.fromtimestamp(int(timestamp))
+            except (ValueError, TypeError, OSError):
+                pass
+
+        notice = EmailNotification(
+            gmail_msg_id=msg_id,
+            subject=message[:100],
+            sender=f"WhatsApp: {source}",
+            received_at=received_at,
+            category=result["category"],
+            priority=result["priority"],
+            summary=f"[{sender}] {message[:200]}",
+            raw_body=message,
+        )
+        db.add(notice)
+        db.commit()
+
+    logger.info("Stored WhatsApp message from %s: category=%s", source, result["category"])
+    return {"status": "stored", "category": result["category"]}
+
+
+@router.get("/webhooks/whatsapp-groups")
+async def get_whatsapp_groups():
+    """Returns distinct WhatsApp groups from stored messages with counts."""
+    from sqlmodel import Session, select as sync_select
+    from sqlalchemy import create_engine as sync_create_engine
+    from pathlib import Path
+    from app.models import EmailNotification
+
+    db_path = Path(__file__).resolve().parent.parent.parent / "campusflow.db"
+    engine = sync_create_engine(f"sqlite:///{db_path}")
+
+    with Session(engine) as db:
+        messages = db.exec(
+            sync_select(EmailNotification)
+            .where(EmailNotification.sender.like("WhatsApp:%"))
+            .order_by(EmailNotification.received_at.desc())
+        ).all()
+
+    groups: dict = {}
+    for m in messages:
+        group = (m.sender or "").replace("WhatsApp: ", "")
+        if group not in groups:
+            groups[group] = {"name": group, "count": 0, "last_message": None, "messages": []}
+        groups[group]["count"] += 1
+        if len(groups[group]["messages"]) < 15:
+            groups[group]["messages"].append({
+                "text": m.raw_body or "",
+                "sender": (m.summary or "").split("]")[0].replace("[", "") if m.summary else "",
+                "category": m.category,
+                "date": m.received_at.isoformat() if m.received_at else "",
+            })
+        if not groups[group]["last_message"]:
+            groups[group]["last_message"] = (m.raw_body or "")[:100]
+
+    return list(groups.values())

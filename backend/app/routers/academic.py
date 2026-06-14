@@ -6,7 +6,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.database import get_session
-from app.models import AcademicProfile, Attendance, CourseMark
+from app.models import AcademicProfile, Attendance, CourseMark, TimetableSlot
 
 router = APIRouter()
 
@@ -91,6 +91,7 @@ async def get_available_semesters():
         await orchestrator.close()
 
 
+<<<<<<< HEAD
 @router.get("/attendance/risk")
 async def get_attendance_risk(session: AsyncSession = Depends(get_session)):
     """Compute attendance risk per course from stored Attendance data.
@@ -215,3 +216,25 @@ async def get_required_grades(
     )
 
     return result_data.model_dump()
+=======
+@router.get("/academic/timetable")
+async def get_timetable(session: AsyncSession = Depends(get_session)):
+    """Return the student's weekly timetable."""
+    result = await session.exec(select(TimetableSlot).order_by(TimetableSlot.day, TimetableSlot.slot))
+    slots = result.all()
+    if not slots:
+        return {"message": "No timetable data. Sync VTOP to load."}
+
+    # Group by day for frontend convenience
+    from collections import defaultdict
+    by_day = defaultdict(list)
+    for slot in slots:
+        by_day[slot.day].append({
+            "slot": slot.slot,
+            "course_code": slot.course_code,
+            "course_type": slot.course_type,
+            "venue": slot.venue,
+        })
+
+    return {"timetable": dict(by_day)}
+>>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)

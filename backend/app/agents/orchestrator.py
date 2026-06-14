@@ -541,6 +541,25 @@ Be concise (under 150 words), helpful, and precise."""
                     for e in emails
                 ]
 
+            # Always fetch WhatsApp messages for connector intent
+            wa_result = await session.exec(
+                select(EmailNotification)
+                .where(EmailNotification.sender.like("WhatsApp:%"))
+                .order_by(EmailNotification.received_at.desc())
+                .limit(50)
+            )
+            wa_messages = wa_result.all()
+            if wa_messages:
+                context["whatsapp_messages"] = [
+                    {
+                        "group": (e.sender or "").replace("WhatsApp: ", ""),
+                        "message": e.raw_body or "",
+                        "date": e.received_at.isoformat() if e.received_at else "",
+                        "category": e.category,
+                    }
+                    for e in wa_messages
+                ]
+
         if "history" in requires:
             context["conversation_summary"] = self.memory.get_summary(session_id)
 

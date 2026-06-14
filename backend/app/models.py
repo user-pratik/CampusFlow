@@ -132,11 +132,16 @@ class EmailNotification(SQLModel, table=True):
 
 
 class TimetableSlot(SQLModel, table=True):
+<<<<<<< HEAD
     """A single timetable slot scraped from VTOP StudentTimeTableChn."""
+=======
+    """A single timetable slot (day + time + course)."""
+>>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)
 
     __tablename__ = "timetable_slots"
 
     id: int | None = Field(default=None, primary_key=True)
+<<<<<<< HEAD
     semester_id: str = Field(index=True)
     day_of_week: str  # Monday, Tuesday, etc.
     start_time: str  # HH:MM
@@ -218,3 +223,11 @@ class PrepChecklist(SQLModel, table=True):
     drive_id: int = Field(foreign_key="placement_drives.id", index=True)
     items: str = Field(default="[]")  # JSON array of {task, completed, round_type}
     created_at: datetime = Field(default_factory=datetime.utcnow)
+=======
+    day: str  # Monday, Tuesday, etc.
+    slot: str  # Time slot name or range
+    course_code: str
+    course_type: str = "TH"  # TH, ETH, LO, LI, SS, LAB
+    venue: str | None = None
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+>>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)

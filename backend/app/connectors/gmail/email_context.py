@@ -73,3 +73,48 @@ async def get_email_context_list(session: AsyncSession, max_emails: int = 30) ->
         }
         for e in emails
     ]
+
+
+async def get_whatsapp_context(session: AsyncSession, max_messages: int = 50) -> str:
+    """Fetch WhatsApp messages from DB (stored via n8n webhook).
+
+    WhatsApp messages are stored in EmailNotification with sender like 'WhatsApp: ...'
+    Groups messages by group name for clear LLM context.
+
+    Args:
+        session: Async database session.
+        max_messages: Maximum number of messages to include.
+
+    Returns:
+        Formatted string of WhatsApp group messages grouped by group name.
+    """
+    from collections import defaultdict
+
+    result = await session.exec(
+        select(EmailNotification)
+        .where(EmailNotification.sender.like("WhatsApp:%"))
+        .order_by(EmailNotification.received_at.desc())
+        .limit(max_messages)
+    )
+    messages = result.all()
+
+    if not messages:
+        return ""
+
+    # Group messages by group name
+    groups = defaultdict(list)
+    for m in messages:
+        group = (m.sender or "").replace("WhatsApp: ", "")
+        groups[group].append(m.raw_body or "")
+
+    lines = ["=== WHATSAPP GROUP MESSAGES ==="]
+    lines.append(f"Total groups: {len(groups)}")
+    lines.append(f"Group names: {', '.join(groups.keys())}")
+    lines.append("---")
+
+    for group, msgs in groups.items():
+        lines.append(f"\nGROUP: {group}")
+        for msg in msgs[:10]:
+            lines.append(f"  - {msg[:200]}")
+
+    return "\n".join(lines)

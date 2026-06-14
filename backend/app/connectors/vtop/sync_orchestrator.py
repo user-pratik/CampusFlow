@@ -194,6 +194,10 @@ class SyncOrchestrator:
                     error="Session expired while scraping marks.",
                 )
 
+            # Scrape timetable
+            timetable_records = await self._scrape_timetable(semester_id)
+            # Timetable failure is non-fatal (don't abort sync)
+
             # Scrape CGPA
             profile_data = await self._scrape_cgpa()
             if profile_data is None:
@@ -213,6 +217,7 @@ class SyncOrchestrator:
             # Persist data (only if non-empty per Req 6.6)
             await self._persist_attendance(attendance_records)
             await self._persist_marks(marks_records)
+            await self._persist_timetable(timetable_records or [])
             await self._persist_profile(profile_data)
             await self._persist_timetable(timetable_records, semester_id)
 
@@ -250,6 +255,17 @@ class SyncOrchestrator:
             logger.warning("Session expired during attendance scrape.")
             await self.session_store.mark_expired()
             return None
+
+        # Debug: log response snippet to identify table structure
+        logger.info("Attendance response length: %d chars, URL: %s", len(resp.text), resp.url)
+        if len(resp.text) < 500:
+            logger.info("Attendance response (short): %s", resp.text[:500])
+
+        # Save debug HTML for inspection
+        from pathlib import Path
+        debug_path = Path(__file__).resolve().parent.parent.parent.parent / "debug_attendance.html"
+        debug_path.write_text(resp.text[:20000], encoding="utf-8")
+        logger.info("Saved attendance HTML to %s", debug_path)
 
         soup = BeautifulSoup(resp.text, "lxml")
         self._update_csrf(soup)
@@ -418,6 +434,7 @@ class SyncOrchestrator:
             data["total_credits"],
         )
 
+<<<<<<< HEAD
     async def _persist_timetable(self, records: list[dict], semester_id: str) -> None:
         """Persist timetable slots to DB, clearing old slots for this semester first.
 
@@ -446,6 +463,68 @@ class SyncOrchestrator:
                 ))
             await session.commit()
         logger.info("Persisted %d timetable slots for semester %s.", len(records), semester_id)
+=======
+    async def _scrape_timetable(self, semester_id: str) -> list[dict] | None:
+        """Scrape timetable for a semester.
+
+        The timetable is fetched via POST to /vtop/processViewTimeTable
+        (not StudentTimeTableChn — that returns the page shell).
+
+        Returns:
+            List of timetable slot records, or None if session expired.
+        """
+        try:
+            import time
+            resp = await self.client.post(
+                f"{VTOP_BASE_URL}/processViewTimeTable",
+                data={
+                    "_csrf": self._csrf,
+                    "semesterSubId": semester_id,
+                    "authorizedID": self._authorized_id,
+                    "x": time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()),
+                },
+            )
+
+            if self._is_login_redirect(resp):
+                logger.warning("Session expired during timetable scrape.")
+                await self.session_store.mark_expired()
+                return None
+
+            # Debug: save HTML for inspection
+            from pathlib import Path
+            debug_path = Path(__file__).resolve().parent.parent.parent.parent / "debug_timetable.html"
+            debug_path.write_text(resp.text[:30000], encoding="utf-8")
+            logger.info("Timetable response: %d chars", len(resp.text))
+
+            soup = BeautifulSoup(resp.text, "lxml")
+            self._update_csrf(soup)
+            records = parse_timetable(soup)
+            logger.info("Scraped %d timetable entries.", len(records))
+            return records
+        except Exception as e:
+            logger.warning("Timetable scrape failed (non-fatal): %s", e)
+            return []
+
+    async def _persist_timetable(self, records: list[dict]) -> None:
+        """Persist timetable records to DB, replacing existing ones."""
+        if not records:
+            logger.info("No timetable records to persist — preserving existing.")
+            return
+
+        async with async_session_maker() as session:
+            await session.exec(delete(TimetableSlot))
+            for rec in records:
+                session.add(TimetableSlot(
+                    day=rec.get("day", ""),
+                    slot=rec.get("slot", ""),
+                    course_code=rec.get("course_code", ""),
+                    course_type=rec.get("course_type", "TH"),
+                    venue=rec.get("venue"),
+                    updated_at=datetime.utcnow(),
+                ))
+            await session.commit()
+        logger.info("Persisted %d timetable entries.", len(records))
+>>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)
 
     async def close(self) -> None:
         """Close the underlying HTTP client."""

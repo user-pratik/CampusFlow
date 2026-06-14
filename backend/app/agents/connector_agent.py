@@ -133,9 +133,29 @@ class ConnectorAgent(BaseAgent):
         sub_intent = payload.get("sub_intent", "")
         context = payload.get("context", {})
 
-        # Build context strings
-        whatsapp_groups = self._format_groups()
-        whatsapp_messages = self._format_messages(user_message)
+        # Build context strings — prefer real DB data over fabricated
+        db_whatsapp = context.get("whatsapp_messages")
+        if db_whatsapp:
+            # Derive groups from real messages and group messages by group name
+            from collections import defaultdict
+            grouped = defaultdict(list)
+            for m in db_whatsapp:
+                grouped[m.get("group", "Unknown")].append(m.get("message", ""))
+
+            whatsapp_groups = f"Total groups: {len(grouped)}\nGroup names: {', '.join(grouped.keys())}\n"
+            whatsapp_groups += "\n".join(f"- {g} ({len(msgs)} messages)" for g, msgs in grouped.items())
+
+            # Format messages grouped by group
+            msg_lines = []
+            for group, msgs in grouped.items():
+                msg_lines.append(f"\nGROUP: {group}")
+                for msg in msgs[:10]:
+                    msg_lines.append(f"  - {msg[:200]}")
+            whatsapp_messages = "\n".join(msg_lines) if msg_lines else "No messages."
+        else:
+            whatsapp_groups = self._format_groups()
+            whatsapp_messages = self._format_messages(user_message, None)
+
         emails = self._format_emails(user_message, context.get("emails"))
         calendar = self._format_calendar()
         timetable = self._format_timetable()
@@ -205,8 +225,29 @@ class ConnectorAgent(BaseAgent):
             lines.append(f"- {g['name']} ({g['type']}, {g['members']} members)")
         return "\n".join(lines)
 
-    def _format_messages(self, query: str) -> str:
-        """Format WhatsApp messages, prioritizing relevant ones based on query."""
+    def _format_messages(self, query: str, db_messages: list[dict] | None = None) -> str:
+        """Format WhatsApp messages, using real DB messages if available."""
+        q = query.lower()
+
+        # Use real WhatsApp messages from DB if available
+        if db_messages:
+            # Filter based on query keywords
+            if any(kw in q for kw in ["oracle", "java", "vit"]):
+                filtered = [m for m in db_messages if any(kw in (m.get("group", "") + m.get("message", "")).lower() for kw in q.split())]
+                if not filtered:
+                    filtered = db_messages[:10]
+            else:
+                filtered = db_messages[:15]
+
+            lines = []
+            for m in filtered[:15]:
+                lines.append(
+                    f"[{m.get('group', 'Unknown')}] ({m.get('date', '')[:10]}):\n"
+                    f"  \"{m.get('message', '')[:300]}\""
+                )
+            return "\n\n".join(lines) if lines else "No recent WhatsApp messages."
+
+        # Fallback to fabricated data
         messages = self._whatsapp_data.get("messages", [])
         q = query.lower()
 

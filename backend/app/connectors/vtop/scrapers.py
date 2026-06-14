@@ -12,11 +12,19 @@ logger = logging.getLogger(__name__)
 def parse_attendance(soup: BeautifulSoup) -> list[dict]:
     """Parse the attendance page into structured records.
 
+    VTOP returns a table with columns:
+    Sl.No | Course Code | Course Title | Course Type | Slot | Faculty | 
+    Attendance Type | Reg Date | Attendance Date | Attended | Total | Percentage | Status | View
+
     Returns:
         List of dicts with: course_code, course_title, percentage, attended, total
     """
     records = []
-    table = soup.find("table", {"id": re.compile(r"attendance", re.I)})
+
+    # Find the attendance table — it's inside div#getStudentDetails
+    table = soup.find("table", class_="table")
+    if not table:
+        table = soup.find("table", {"id": re.compile(r"attendance|student", re.I)})
     if not table:
         # Fallback: find any table with attendance-like headers
         tables = soup.find_all("table")
@@ -30,21 +38,52 @@ def parse_attendance(soup: BeautifulSoup) -> list[dict]:
         logger.warning("Attendance table not found in page.")
         return records
 
-    rows = table.find_all("tr")[1:]  # Skip header row
-    for row in rows:
+    rows = table.find_all("tr")
+    if len(rows) < 2:
+        return records
+
+    # Find column indices from header row
+    headers = [th.get_text(strip=True).lower() for th in rows[0].find_all("th")]
+    code_idx = title_idx = attended_idx = total_idx = percent_idx = None
+
+    for i, h in enumerate(headers):
+        if "code" in h:
+            code_idx = i
+        elif "title" in h:
+            title_idx = i
+        elif "attended" in h:
+            attended_idx = i
+        elif "total" in h and "class" in h:
+            total_idx = i
+        elif "percentage" in h:
+            percent_idx = i
+
+    # Fallback if header detection failed — use known VTOP layout
+    if attended_idx is None:
+        # VTOP standard: Sl.No(0), Code(1), Title(2), Type(3), Slot(4), Faculty(5),
+        # AttType(6), RegDate(7), AttDate(8), Attended(9), Total(10), Percentage(11)
+        code_idx, title_idx, attended_idx, total_idx, percent_idx = 1, 2, 9, 10, 11
+
+    for row in rows[1:]:
         cols = [td.get_text(strip=True) for td in row.find_all("td")]
-        if len(cols) >= 6:
-            try:
-                records.append({
-                    "course_code": cols[1],
-                    "course_title": cols[2],
-                    "attended": int(cols[4]) if cols[4].isdigit() else 0,
-                    "total": int(cols[5]) if cols[5].isdigit() else 0,
-                    "percentage": float(cols[6].replace("%", "")) if len(cols) > 6 else 0.0,
-                })
-            except (ValueError, IndexError) as e:
-                logger.debug("Skipping attendance row: %s", e)
-                continue
+        if len(cols) <= max(code_idx or 0, title_idx or 0, attended_idx or 0, total_idx or 0, percent_idx or 0):
+            continue
+        try:
+            attended = int(cols[attended_idx]) if cols[attended_idx].isdigit() else 0
+            total = int(cols[total_idx]) if cols[total_idx].isdigit() else 0
+            pct_str = cols[percent_idx].replace("%", "").strip() if percent_idx is not None else "0"
+            percentage = float(pct_str) if pct_str else 0.0
+
+            records.append({
+                "course_code": cols[code_idx] if code_idx is not None else "",
+                "course_title": cols[title_idx] if title_idx is not None else "",
+                "attended": attended,
+                "total": total,
+                "percentage": percentage,
+            })
+        except (ValueError, IndexError) as e:
+            logger.debug("Skipping attendance row: %s", e)
+            continue
 
     logger.info("Parsed %d attendance records.", len(records))
     return records
@@ -385,3 +424,71 @@ def _parse_float(value: str) -> float | None:
         return float(value.replace(",", ""))
     except ValueError:
         return None
+
+
+def parse_timetable(soup: BeautifulSoup) -> list[dict]:
+    """Parse the VTOP timetable/registration page into structured records.
+
+    The timetable response has a table with columns:
+    Sl.No | Class Group | Course | L T P J C | Category | Course Option | Class Id | Slot/Venue
+
+    The Slot/Venue column contains slot codes and room numbers like "TG1 -AB3-306"
+    or "L31+L32+L49+L50 -AB1-209"
+
+    Returns:
+        List of dicts with: course_code, course_title, course_type, slot, venue
+    """
+    records = []
+
+    table = soup.find("table")
+    if not table:
+        logger.warning("Timetable table not found in page.")
+        return records
+
+    rows = table.find_all("tr")
+    if len(rows) < 2:
+        return records
+
+    for row in rows[1:]:
+        cells = [td.get_text(strip=True) for td in row.find_all("td")]
+        if len(cells) < 8:
+            continue
+
+        # Column 2: "BCSE203E - Web Programming( Embedded Theory Only)"
+        course_raw = cells[2]
+        course_code = course_raw.split(" - ")[0].strip() if " - " in course_raw else course_raw[:10]
+        course_title = course_raw.split(" - ")[1].split("(")[0].strip() if " - " in course_raw else ""
+
+        # Determine course type from the course description
+        course_lower = course_raw.lower()
+        if "lab" in course_lower:
+            course_type = "LAB"
+        elif "embedded" in course_lower and "theory" in course_lower:
+            course_type = "ETH"
+        elif "theory" in course_lower:
+            course_type = "TH"
+        else:
+            course_type = "TH"
+
+        # Column 7: "TG1 -AB3-306" or "L31+L32+L49+L50 -AB1-209"
+        slot_venue = cells[7] if len(cells) > 7 else ""
+        # Split slot from venue by " -" separator
+        if " -" in slot_venue:
+            parts = slot_venue.split(" -", 1)
+            slot = parts[0].strip()
+            venue = parts[1].strip() if len(parts) > 1 else ""
+        else:
+            slot = slot_venue.strip()
+            venue = ""
+
+        records.append({
+            "course_code": course_code,
+            "course_title": course_title,
+            "course_type": course_type,
+            "slot": slot,
+            "venue": venue,
+            "day": "",  # VIT uses slot codes, not day-specific — map externally
+        })
+
+    logger.info("Parsed %d timetable entries.", len(records))
+    return records
