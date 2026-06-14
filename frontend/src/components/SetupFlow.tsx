@@ -246,7 +246,7 @@ export default function SetupFlow({ onComplete }: Props) {
             CampusFlow
           </h1>
           <p className="text-sm text-secondary mt-2">
-            Welcome back, Pratik. Connecting your services...
+            Welcome back, Ankit. Connecting your services...
           </p>
         </div>
 

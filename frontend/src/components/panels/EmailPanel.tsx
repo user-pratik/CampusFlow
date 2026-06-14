@@ -70,8 +70,8 @@ export default function EmailPanel({ data }: Props) {
     setError(null);
     try {
       const url = category === "ALL"
-        ? `${BASE}/api/gmail/all`
-        : `${BASE}/api/gmail/all?category=${category}`;
+        ? `${BASE}/api/gmail/emails-only`
+        : `${BASE}/api/gmail/emails-only?category=${category}`;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) {
         setError(`Server error (${res.status}). Try syncing again.`);

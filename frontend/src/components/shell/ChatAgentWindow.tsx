@@ -28,7 +28,7 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Hey Pratik! Ask me about your attendance, marks, deadlines, placements, or schedule. I can also set reminders and plan your day.",
+      content: "Hey Ankit! Ask me about your attendance, marks, deadlines, placements, or schedule. I can also set reminders and plan your day.",
       actions: [
         { label: "How's my attendance?", type: "send" },
         { label: "What's due this week?", type: "send" },
@@ -202,26 +202,56 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
 
 /**
  * Hook to spawn the main Chat Agent floating window.
- * Includes welcome message, suggested actions, full conversation history.
+ * Ensures only ONE chat window exists — focuses it if already open.
  */
 export function useChatAgent() {
-  const { spawnWindow } = useWindowManager();
+  const { spawnWindow, windows, focusWindow } = useWindowManager();
 
   const spawn = useCallback(
     (message?: string) => {
+      // Check if chat window already exists
+      const existing = windows.find(
+        (w) => w.agentName === "Chat" && w.title === "CampusFlow Chat"
+      );
+      if (existing) {
+        focusWindow(existing.id);
+        return;
+      }
+
       spawnWindow(
         "Chat",
         "CampusFlow Chat",
         <ChatWindowContent initialMessage={message} />,
         {
           agentIcon: "💬",
-          size: { width: 400, height: 450 },
-          position: { x: 180, y: 80 },
+          size: { width: 400, height: 500 },
+          position: { x: window.innerWidth - 430, y: 50 },
+          pinned: true,
         }
       );
     },
-    [spawnWindow]
+    [spawnWindow, windows, focusWindow]
   );
 
-  return { spawn };
+  // Auto-spawn on first render
+  const autoSpawn = useCallback(() => {
+    const existing = windows.find(
+      (w) => w.agentName === "Chat" && w.title === "CampusFlow Chat"
+    );
+    if (!existing) {
+      spawnWindow(
+        "Chat",
+        "CampusFlow Chat",
+        <ChatWindowContent />,
+        {
+          agentIcon: "💬",
+          size: { width: 400, height: 500 },
+          position: { x: typeof window !== "undefined" ? window.innerWidth - 430 : 500, y: 50 },
+          pinned: true,
+        }
+      );
+    }
+  }, [spawnWindow, windows]);
+
+  return { spawn, autoSpawn };
 }

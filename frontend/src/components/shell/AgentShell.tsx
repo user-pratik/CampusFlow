@@ -7,6 +7,10 @@ import Desktop from "./Desktop";
 import { useTimetableAgent } from "./TimetableAgentWindow";
 import { useAttendanceRiskAgent } from "./AttendanceRiskAgentWindow";
 import { useNotificationCenter } from "./NotificationCenter";
+import { useEmailAgent } from "./EmailAgentWindow";
+import { useGPAAgent } from "./GPAAgentWindow";
+import { useWhatsAppAgent } from "./WhatsAppAgentWindow";
+import { useChatAgent } from "./ChatAgentWindow";
 
 const MOCK_AGENT_COUNT = 3;
 
@@ -209,6 +213,18 @@ function AgentShellInner() {
   const { autoSpawn: autoSpawnTimetable } = useTimetableAgent();
   const { checkAndSpawn: checkAttendanceRisk } = useAttendanceRiskAgent();
   const { unreadCount, openNotificationCenter } = useNotificationCenter();
+  const { spawn: spawnEmail } = useEmailAgent();
+  const { spawn: spawnGPA } = useGPAAgent();
+  const { spawn: spawnWhatsApp } = useWhatsAppAgent();
+  const { autoSpawn: autoSpawnChat } = useChatAgent();
+
+  // Spawn Chat window immediately on app load (pinned, bottom-right)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      autoSpawnChat();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [autoSpawnChat]);
 
   // Spawn Timetable Agent window on app load
   useEffect(() => {
@@ -357,6 +373,9 @@ function AgentShellInner() {
         onNotificationClick={openNotificationCenter}
         onSyncClick={handleSyncClick}
         syncStatus={syncStatus}
+        onLaunchEmail={spawnEmail}
+        onLaunchWhatsApp={spawnWhatsApp}
+        onLaunchMarks={spawnGPA}
       />
       <Desktop />
     </div>

@@ -43,6 +43,9 @@ AVAILABLE AGENTS:
    Data source: academic_regulations.json (no DB query needed)
 7. "chat" — General conversation, vague queries, multi-topic summaries, things that don't fit one agent.
    No specific data source — orchestrator answers conversationally.
+8. "connector" — WhatsApp messages, emails, inbox queries, group messages, notifications.
+   Questions like "what did X group say", "any emails about", "check my messages", "WhatsApp groups"
+   Data source: email_notifications table (WhatsApp: sender LIKE 'WhatsApp:%', emails: sender NOT LIKE 'WhatsApp:%')
 
 DECISION RULES:
 - "attendance" + skip/bunk/classes/percentage context → attendance_risk
@@ -51,6 +54,7 @@ DECISION RULES:
 - "placement"/"drive"/"company"/"hiring" → placements
 - "timetable"/"schedule"/"today's class"/"free slot" → timetable
 - Policy questions ("do I need", "what's the rule", "requirement", "allowed") → regulations
+- WhatsApp/email/inbox/messages/groups ("whatsapp", "email", "inbox", "group", "messages") → connector
 - Vague/greeting/multi-domain/ambiguous → chat
 - If genuinely unsure between two agents → chat (never guess)
 
@@ -176,6 +180,14 @@ async def plan_workflow(message: str, history: list[dict]) -> WorkflowPlan:
             plan.agent = "chat"
             plan.action = "chat_only"
 
+        # Hard override: WhatsApp/email keywords ALWAYS go to connector
+        lower_msg = message.lower()
+        if plan.agent == "chat" and any(w in lower_msg for w in ["whatsapp", "email", "inbox", "messages from", "group message", "check my mail", "any mail", "any email"]):
+            logger.info("OVERRIDE: LLM said 'chat' but message has WhatsApp/email keywords — forcing connector")
+            plan.agent = "connector"
+            plan.action = "chat_only"
+            plan.data_request = {"source": "whatsapp_email", "filters": {}}
+
         logger.info(
             "Workflow plan: agent=%s, action=%s, source=%s, filters=%s, confidence=%.2f | %s",
             plan.agent, plan.action, plan.source,
@@ -249,6 +261,15 @@ def _keyword_fallback(message: str) -> WorkflowPlan:
             "data_request": {"source": "regulations", "filters": {}},
             "reasoning": "Keyword fallback: regulations query (LLM unavailable)",
             "confidence": 0.8,
+        })
+
+    if any(w in lower for w in ["whatsapp", "email", "inbox", "messages", "group", "mail"]):
+        return WorkflowPlan({
+            "action": "chat_only",
+            "agent": "connector",
+            "data_request": {"source": "whatsapp_email", "filters": {}},
+            "reasoning": "Keyword fallback: WhatsApp/email query (LLM unavailable)",
+            "confidence": 0.85,
         })
 
     return WorkflowPlan({

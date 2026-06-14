@@ -266,3 +266,37 @@ async def get_calendar_events():
 
     events = list_upcoming_events(max_results=15)
     return {"events": events}
+
+
+@router.get("/emails-only")
+async def get_emails_only(
+    category: str | None = Query(None),
+    limit: int = Query(50, ge=1, le=200),
+    session: AsyncSession = Depends(get_session),
+):
+    """Return only Gmail emails (excludes WhatsApp messages)."""
+    stmt = (
+        select(EmailNotification)
+        .where(~EmailNotification.sender.like("WhatsApp:%"))
+        .order_by(EmailNotification.received_at.desc())
+        .limit(limit)
+    )
+    if category:
+        stmt = stmt.where(EmailNotification.category == category.upper())
+    result = await session.exec(stmt)
+    return result.all()
+
+
+@router.get("/whatsapp-only")
+async def get_whatsapp_only(
+    limit: int = Query(100, ge=1, le=500),
+    session: AsyncSession = Depends(get_session),
+):
+    """Return only WhatsApp messages (sender starts with 'WhatsApp:')."""
+    result = await session.exec(
+        select(EmailNotification)
+        .where(EmailNotification.sender.like("WhatsApp:%"))
+        .order_by(EmailNotification.received_at.desc())
+        .limit(limit)
+    )
+    return result.all()

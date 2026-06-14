@@ -219,7 +219,6 @@ class SyncOrchestrator:
             await self._persist_marks(marks_records)
             await self._persist_timetable(timetable_records or [])
             await self._persist_profile(profile_data)
-            await self._persist_timetable(timetable_records, semester_id)
 
             return SyncResult(
                 status="completed",
@@ -292,6 +291,12 @@ class SyncOrchestrator:
             logger.warning("Session expired during marks scrape.")
             await self.session_store.mark_expired()
             return None
+
+        # Debug: save marks HTML
+        from pathlib import Path
+        debug_path = Path(__file__).resolve().parent.parent.parent.parent / "debug_marks.html"
+        debug_path.write_text(resp.text[:30000], encoding="utf-8")
+        logger.info("Marks response: %d chars", len(resp.text))
 
         soup = BeautifulSoup(resp.text, "lxml")
         self._update_csrf(soup)
@@ -486,8 +491,11 @@ class SyncOrchestrator:
             for rec in records:
                 session.add(TimetableSlot(
                     day=rec.get("day", ""),
+                    day_of_week=rec.get("day", ""),
                     slot=rec.get("slot", ""),
+                    slot_name=rec.get("slot", ""),
                     course_code=rec.get("course_code", ""),
+                    course_name=rec.get("course_title", ""),
                     course_type=rec.get("course_type", "TH"),
                     venue=rec.get("venue"),
                     updated_at=datetime.utcnow(),

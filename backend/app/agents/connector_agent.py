@@ -76,6 +76,8 @@ ELIGIBILITY TAGS (pre-computed for placement emails):
 WHATSAPP GROUPS THE STUDENT IS PART OF:
 {whatsapp_groups}
 
+CRITICAL RULE: You must ONLY reference groups that appear in the list above. If the list says "No WhatsApp groups" or is empty, say "I don't have access to your WhatsApp groups yet." Do NOT invent or guess group names based on the student's interests or profile.
+
 RECENT WHATSAPP MESSAGES:
 {whatsapp_messages}
 
@@ -102,8 +104,8 @@ class ConnectorAgent(BaseAgent):
     """Handles queries about WhatsApp messages, emails, and calendar events."""
 
     def __init__(self):
-        self._whatsapp_data = _load_json("whatsapp_groups.json")
-        self._email_data = _load_json("emails.json")
+        self._whatsapp_data = {}  # No longer using fabricated data
+        self._email_data = {}    # Real data comes from context
         self._calendar_data = _load_json("calendar.json")
         self._regulations = _load_json("academic_regulations.json")
 
@@ -153,8 +155,9 @@ class ConnectorAgent(BaseAgent):
                     msg_lines.append(f"  - {msg[:200]}")
             whatsapp_messages = "\n".join(msg_lines) if msg_lines else "No messages."
         else:
-            whatsapp_groups = self._format_groups()
-            whatsapp_messages = self._format_messages(user_message, None)
+            # No DB data — show empty state, do NOT use fabricated data
+            whatsapp_groups = "No WhatsApp groups connected yet."
+            whatsapp_messages = "No WhatsApp messages available. Connect via n8n webhook."
 
         emails = self._format_emails(user_message, context.get("emails"))
         calendar = self._format_calendar()
@@ -190,6 +193,14 @@ class ConnectorAgent(BaseAgent):
             history=history_text,
             today=datetime.now().strftime("%A, %B %d, %Y"),
         )
+
+        # DEBUG: Log what's being sent to the LLM
+        logger.info("=== SYSTEM PROMPT START ===")
+        logger.info(system_prompt[:1000])
+        logger.info("=== SYSTEM PROMPT END ===")
+        logger.info("=== CONTEXT KEYS: %s ===", list(context.keys()))
+        logger.info("=== WHATSAPP COUNT: %d ===", len(context.get("whatsapp_messages", [])))
+        logger.info("=== whatsapp_groups var: %s ===", whatsapp_groups[:200] if whatsapp_groups else "EMPTY")
 
         try:
             response = await chat_completion(
@@ -347,35 +358,8 @@ class ConnectorAgent(BaseAgent):
                 )
             return "\n\n".join(lines) if lines else "No matching emails found."
 
-        # Fallback to fabricated data
-        emails = self._email_data.get("emails", [])
-
-        # Filter based on query keywords
-        if "unread" in q:
-            filtered = [e for e in emails if not e["read"]]
-        elif "placement" in q or "job" in q or "intern" in q:
-            filtered = [e for e in emails if e["category"] == "placement"]
-        elif "hackathon" in q or "amazon" in q:
-            filtered = [e for e in emails if "hackathon" in e.get("category", "")]
-        else:
-            # Show most recent, prioritize unread and starred
-            filtered = sorted(
-                emails,
-                key=lambda e: (not e["read"], e.get("starred", False), e["timestamp"]),
-                reverse=True,
-            )[:6]
-
-        lines = []
-        for e in filtered[:6]:
-            status = "📩 UNREAD" if not e["read"] else "📧"
-            star = " ⭐" if e.get("starred") else ""
-            lines.append(
-                f"{status}{star} From: {e['from_name']} <{e['from']}>\n"
-                f"  Subject: {e['subject']}\n"
-                f"  Preview: {e['preview']}\n"
-                f"  Date: {e['timestamp'][:10]}"
-            )
-        return "\n\n".join(lines) if lines else "No relevant emails."
+        # No fabricated fallback — return empty state
+        return "No email data available. Sync Gmail first."
 
     def _format_calendar(self) -> str:
         """Format upcoming calendar events."""

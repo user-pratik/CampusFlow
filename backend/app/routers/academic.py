@@ -102,6 +102,14 @@ async def get_attendance_risk(session: AsyncSession = Depends(get_session)):
     if not records:
         return {"message": "No attendance data. Sync VTOP first.", "risks": []}
 
+    # Deduplicate by course_code — keep the record with lowest attendance %
+    seen: dict = {}
+    for rec in records:
+        code = rec.course_code
+        if code not in seen or rec.percentage < seen[code].percentage:
+            seen[code] = rec
+    deduped = list(seen.values())
+
     risks = [
         calculate_risk(
             course_code=rec.course_code,
@@ -109,7 +117,7 @@ async def get_attendance_risk(session: AsyncSession = Depends(get_session)):
             attended=rec.attended,
             total=rec.total,
         )
-        for rec in records
+        for rec in deduped
     ]
 
     return {

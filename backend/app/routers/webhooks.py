@@ -126,7 +126,7 @@ async def receive_whatsapp_n8n(request: Request):
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
-    message = payload.get("message", "")
+    message = payload.get("message", "").lstrip("=")
     source = payload.get("source", "WhatsApp Group").lstrip("=")
     sender = payload.get("sender", "").lstrip("=")
     timestamp = payload.get("timestamp", None)

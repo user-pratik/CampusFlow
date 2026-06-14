@@ -146,9 +146,9 @@ function AttendanceRiskWindowContent() {
       </div>
 
       {/* Per-course cards */}
-      {sortedRisks.map((risk) => (
+      {sortedRisks.map((risk, index) => (
         <div
-          key={risk.course_code}
+          key={`${risk.course_code}-${index}`}
           className={`p-2.5 rounded-md border ${riskBadgeClasses(risk.risk_level)}`}
         >
           <div className="flex items-center justify-between gap-2">

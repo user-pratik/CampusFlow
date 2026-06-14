@@ -182,6 +182,7 @@ class ActionAgent(BaseAgent):
 
             # If it's a calendar event, also create it in Google Calendar
             if action.get("type") == "calendar_event":
+                logger.info("ACTION AGENT: Calendar event detected! Data: %s", action.get("data", {}))
                 gcal_result = await self._create_google_calendar_event(action.get("data", {}))
                 if gcal_result and "link" in gcal_result:
                     saved["calendar_link"] = gcal_result["link"]
@@ -321,14 +322,8 @@ class ActionAgent(BaseAgent):
             return False
 
     async def _create_google_calendar_event(self, data: dict) -> dict | None:
-        """Create a Google Calendar event from action data.
-
-        Args:
-            data: Dict with title, date, start_time, end_time, location, description.
-
-        Returns:
-            Result dict from calendar API, or None on failure.
-        """
+        """Create a Google Calendar event from action data."""
+        logger.info(">>> _create_google_calendar_event CALLED with: %s", data)
         try:
             from app.connectors.gmail.calendar_client import create_calendar_event
 

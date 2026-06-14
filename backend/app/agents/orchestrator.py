@@ -1,4 +1,4 @@
-"""Orchestrator Agent — Routes user queries to specialist agents and maintains conversation memory.
+"""Orchestrator Agent -- Routes user queries to specialist agents and maintains conversation memory.
 
 This is the central brain of CampusFlow's agentic system. It:
 1. Classifies user intent
@@ -36,20 +36,20 @@ Given the user's message and conversation history, classify the intent into ONE 
 - "general": General conversation, greetings, vague questions ("how am I doing", "what's up"), or queries that don't clearly fit ONE specific category
 
 DISAMBIGUATION RULES (follow strictly):
-1. "attendance" + "%"/"percent"/"skip"/"bunk"/"classes" → ALWAYS "attendance_risk", NEVER "academic"
-2. "CGPA"/"SGPA"/"GPA"/"grade point"/"target CGPA"/"what if grade" → ALWAYS "academic"
-3. "marks"/"score"/"CAT"/"FAT" → "academic"
-4. "deadline"/"due"/"submission" WITHOUT company context → "connector"
-5. "schedule"/"class"/"today"/"tomorrow" about VIEWING existing timetable → "connector"
-6. "schedule"/"plan" about CREATING a new study plan → "schedule"
-7. Vague queries like "how am I doing", "what's happening" → ALWAYS "general"
+1. "attendance" + "%"/"percent"/"skip"/"bunk"/"classes" -> ALWAYS "attendance_risk", NEVER "academic"
+2. "CGPA"/"SGPA"/"GPA"/"grade point"/"target CGPA"/"what if grade" -> ALWAYS "academic"
+3. "marks"/"score"/"CAT"/"FAT" -> "academic"
+4. "deadline"/"due"/"submission" WITHOUT company context -> "connector"
+5. "schedule"/"class"/"today"/"tomorrow" about VIEWING existing timetable -> "connector"
+6. "schedule"/"plan" about CREATING a new study plan -> "schedule"
+7. Vague queries like "how am I doing", "what's happening" -> ALWAYS "general"
 8. If BOTH attendance AND grade/CGPA are mentioned, pick the DOMINANT subject (the one the user wants answered)
 9. If genuinely ambiguous between 2+ intents, choose "general"
 
 CONFIDENCE:
 - 0.9+: unambiguous, clearly one intent
 - 0.7-0.89: slight ambiguity but one intent is clearly stronger
-- below 0.7: genuinely ambiguous — in this case set intent to "general"
+- below 0.7: genuinely ambiguous -- in this case set intent to "general"
 
 Return ONLY a JSON object:
 {
@@ -85,12 +85,15 @@ class OrchestratorAgent(BaseAgent):
             {
                 "response": str,
                 "intent": str,
-                "actions": list[dict],  # suggested UI actions
-                "pending_actions": list[dict],  # actions queued for execution
+                "actions": list[dict],
+                "pending_actions": list[dict],
                 "panel": str | None,
                 "panel_data": dict | None
             }
         """
+        print("🔥 ORCHESTRATOR CALLED", flush=True)
+        print(f"🔥 PAYLOAD: {payload.get('user_message', '')[:80]}", flush=True)
+
         user_message = payload["user_message"]
         session_id = payload.get("session_id", "default")
         window_context = payload.get("window_context")
@@ -113,11 +116,11 @@ class OrchestratorAgent(BaseAgent):
         if USE_WORKFLOW_PLANNER:
             return await self._execute_planned(user_message, session_id, history)
 
-        # ─── Legacy Path: classify → gather → route ───────────────────────────
+        # ─── Legacy Path: classify -> gather -> route ───────────────────────────
         return await self._execute_legacy(user_message, session_id, history)
 
     async def _execute_planned(self, user_message: str, session_id: str, history: list[dict]) -> dict:
-        """New LLM-driven workflow: single planner step → scoped retrieval → leaf agent."""
+        """New LLM-driven workflow: single planner step -> scoped retrieval -> leaf agent."""
         from app.agents.workflow_planner import (
             plan_workflow,
             retrieve_with_condition_resolution,
@@ -127,7 +130,7 @@ class OrchestratorAgent(BaseAgent):
         # Step 1: LLM plans the workflow (agent + data scope + reasoning)
         plan = await plan_workflow(user_message, history)
 
-        # Step 2: Two-pass retrieval — scoped data + condition resolution
+        # Step 2: Two-pass retrieval -- scoped data + condition resolution
         prefetched_data = await retrieve_with_condition_resolution(plan)
 
         # Step 3: Build orchestrator context to forward to leaf agent
@@ -151,14 +154,14 @@ class OrchestratorAgent(BaseAgent):
             try:
                 result = await self.academic_agent.execute(agent_payload)
             except Exception as e:
-                logger.warning("Academic agent failed for attendance: %s — using data fallback.", e)
+                logger.warning("Academic agent failed for attendance: %s -- using data fallback.", e)
                 result = self._data_fallback_response(prefetched_data, "attendance")
             intent = "attendance_risk"
         elif plan.agent == "gpa_projection":
             try:
                 result = await self.academic_agent.execute(agent_payload)
             except Exception as e:
-                logger.warning("Academic agent failed for GPA: %s — using data fallback.", e)
+                logger.warning("Academic agent failed for GPA: %s -- using data fallback.", e)
                 result = self._data_fallback_response(prefetched_data, "marks")
             intent = "academic"
         elif plan.agent == "regulations":
@@ -183,6 +186,52 @@ class OrchestratorAgent(BaseAgent):
         elif plan.agent == "action":
             result = await self.action_agent.execute(agent_payload)
             intent = "action"
+        elif plan.agent == "connector":
+            # WhatsApp/email queries — fetch context and pass to connector agent
+            from app.database import async_session_maker
+            from sqlmodel import select
+            from app.models import EmailNotification
+            async with async_session_maker() as session:
+                wa_result = await session.exec(
+                    select(EmailNotification)
+                    .where(EmailNotification.sender.like("WhatsApp:%"))
+                    .order_by(EmailNotification.received_at.desc())
+                    .limit(50)
+                )
+                wa_messages = wa_result.all()
+                email_result = await session.exec(
+                    select(EmailNotification)
+                    .where(~EmailNotification.sender.like("WhatsApp:%"))
+                    .order_by(EmailNotification.received_at.desc())
+                    .limit(30)
+                )
+                email_messages = email_result.all()
+
+            agent_payload["context"]["whatsapp_messages"] = [
+                {
+                    "group": (e.sender or "").replace("WhatsApp: ", ""),
+                    "message": e.raw_body or "",
+                    "date": e.received_at.isoformat() if e.received_at else "",
+                    "category": e.category,
+                }
+                for e in wa_messages
+            ]
+            agent_payload["context"]["emails"] = [
+                {
+                    "from": e.sender,
+                    "subject": e.subject,
+                    "date": e.received_at.isoformat() if e.received_at else "",
+                    "category": e.category,
+                    "priority": e.priority,
+                    "summary": e.summary,
+                    "body": (e.raw_body or "")[:500],
+                    "is_read": e.is_read,
+                }
+                for e in email_messages
+            ]
+            print(f"🔥 CONNECTOR: whatsapp={len(wa_messages)}, emails={len(email_messages)}", flush=True)
+            result = await self.connector_agent.execute(agent_payload)
+            intent = "connector"
         else:
             # chat / general / unknown
             result = await self._handle_general(agent_payload)
@@ -221,10 +270,23 @@ class OrchestratorAgent(BaseAgent):
         requires_context = classification.get("requires_context", [])
         confidence = classification.get("confidence", 0.5)
 
-        # Enforce confidence threshold — fall back to general if uncertain
+        # Keyword override: force connector for WhatsApp/email queries
+        msg_lower = user_message.lower()
+        if any(kw in msg_lower for kw in ["whatsapp", "group", "wa group", "messages from"]):
+            intent = "connector"
+            if "emails" not in requires_context:
+                requires_context.append("emails")
+            confidence = 0.95
+        elif any(kw in msg_lower for kw in ["email", "inbox", "gmail", "mail"]):
+            intent = "connector"
+            if "emails" not in requires_context:
+                requires_context.append("emails")
+            confidence = 0.95
+
+        # Enforce confidence threshold -- fall back to general if uncertain
         if confidence < 0.7 and intent != "general":
             logger.info(
-                "Low confidence %.2f for intent '%s' — falling back to general.",
+                "Low confidence %.2f for intent '%s' -- falling back to general.",
                 confidence, intent,
             )
             intent = "general"
@@ -293,8 +355,8 @@ class OrchestratorAgent(BaseAgent):
     ) -> dict:
         """Handle a follow-up question within a specific agent window.
 
-        Skips intent classification — routes directly using the window's agent type
-        and injects the window's current data into the LLM prompt.
+        Skips intent classification, routes directly using the window agent type
+        and injects the window current data into the LLM prompt.
 
         If the question is about policy/regulations (not calculation), injects
         the regulations data so the agent answers from official rules.
@@ -322,7 +384,7 @@ class OrchestratorAgent(BaseAgent):
                     att = regs.get("attendance", {})
                     regulations_text = f"""
 
-IMPORTANT — VIT OFFICIAL ATTENDANCE REGULATIONS (from FFCS v4.0):
+IMPORTANT -- VIT OFFICIAL ATTENDANCE REGULATIONS (from FFCS v4.0):
 - Minimum Required: {att.get('minimum_required', 75)}% per course
 - Rule: {att.get('minimum_required_note', 'N/A')}
 - Consequence: {att.get('consequence', 'N/A')}
@@ -334,10 +396,10 @@ IMPORTANT — VIT OFFICIAL ATTENDANCE REGULATIONS (from FFCS v4.0):
 - Medical Leave: {att.get('medical', 'N/A')}
 - On Duty: {att.get('on_duty', 'N/A')}
 
-STUDENT CONTEXT: This student has CGPA 9.11 and no backlogs — check if the 9-pointer exemption applies to them.
+STUDENT CONTEXT: This student has CGPA 9.11 and no backlogs -- check if the 9-pointer exemption applies to them.
 
-NOTE: The 75% figure in this tool's calculator is the same as VIT's actual regulation threshold.
-Frame your answer from the REGULATION perspective, not the tool's internal threshold.
+NOTE: The 75% figure in this tool calculator is the same as VIT actual regulation threshold.
+Frame your answer from the REGULATION perspective, not the tool internal threshold.
 Do NOT fabricate exemptions or rules that are not listed above. Only state what the regulations explicitly say."""
                 else:
                     # Generic regulations injection for other agents
@@ -350,15 +412,15 @@ Do NOT fabricate exemptions or rules that are not listed above. Only state what 
         if agent_type == "attendance_risk":
             threshold_disclaimer = """
 IMPORTANT DISTINCTION:
-- This tool tracks toward a 75% threshold, which matches VIT's actual regulation.
+- This tool tracks toward a 75% threshold, which matches VIT actual regulation.
 - When the user asks about POLICY (rules, requirements, consequences), answer from the VIT regulations below.
 - When the user asks about CALCULATIONS (how many classes, what if I skip), use the data displayed.
 - NEVER present an internal tool constant as if it were a regulation without citing the actual rule.
 - VIT HAS a 9-pointer exemption: CGPA >= 9.0 + no backlogs = exempted from 75% rule.
 - Only state exemptions/rules that are explicitly in the regulations data below."""
 
-        system_prompt = f"""\
-You are CampusFlow's {agent_label} assistant for {profile.get('name', 'the student')}.
+        system_prompt = f"""
+You are CampusFlow {agent_label} assistant for {profile.get('name', 'the student')}.
 They are viewing the {agent_label} window which currently shows the following data:
 
 {json.dumps(context_data, indent=2, default=str)[:3000]}
@@ -560,6 +622,11 @@ Be concise (under 150 words), helpful, and precise."""
                     for e in wa_messages
                 ]
 
+        # Debug: log context sizes
+        email_count = len(context.get("emails", []))
+        wa_count = len(context.get("whatsapp_messages", []))
+        logger.info("Context built: emails=%d, whatsapp=%d, requires=%s", email_count, wa_count, requires)
+
         if "history" in requires:
             context["conversation_summary"] = self.memory.get_summary(session_id)
 
@@ -592,13 +659,14 @@ Be concise (under 150 words), helpful, and precise."""
             )
 
         system_prompt = f"""\
-You are CampusFlow, a friendly and intelligent campus assistant for {profile.get('name', 'the student')}.
-You know they study {profile.get('branch', 'CS')} at {profile.get('college', 'VIT')}.
-Their interests are: {', '.join(profile.get('interests', []))}.
-Current focus: {profile.get('current_focus', 'general studies')}.
+You are CampusFlow, a campus assistant for {profile.get('name', 'the student')}.
+They study {profile.get('branch', 'CSE')} at VIT Chennai, CGPA {profile.get('cgpa', 'N/A')}.
 
-Be warm, concise, and helpful. If they ask something you can help with (marks, schedule, reminders), 
-offer to do that. Keep responses under 150 words unless detail is needed.
+CRITICAL RULES:
+- Never invent WhatsApp groups, emails, or any data not explicitly provided below.
+- If asked about WhatsApp groups/messages and no data is provided, say: "Let me check your WhatsApp messages" and suggest asking again so I can route to the correct agent.
+- If asked about emails, attendance, marks -- say "Let me look that up" and suggest a specific query.
+- Do NOT use profile interests to guess/invent group names or email subjects.
 
 CONVERSATION HISTORY:
 {history_text}"""
@@ -652,7 +720,7 @@ CONVERSATION HISTORY:
             lines = ["Here's your marks data:\n"]
             for m in data:
                 score_str = f"{m['score']}" if m.get('score') is not None else "N/A"
-                lines.append(f"• {m['course_code']} — {m['mark_title']}: {score_str}")
+                lines.append(f"• {m['course_code']} -- {m['mark_title']}: {score_str}")
             return {"response": "\n".join(lines), "actions": []}
 
         # Generic fallback: dump as text

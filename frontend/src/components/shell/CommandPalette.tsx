@@ -8,6 +8,7 @@ import { useGPAAgent } from "./GPAAgentWindow";
 import { useDeadlineAgent } from "./DeadlineAgentWindow";
 import { usePlacementAgent } from "./PlacementAgentWindow";
 import { useChatAgent } from "./ChatAgentWindow";
+import { useEmailAgent } from "./EmailAgentWindow";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -22,6 +23,7 @@ export default function CommandPalette() {
   const { spawn: spawnDeadlines } = useDeadlineAgent();
   const { spawn: spawnPlacements } = usePlacementAgent();
   const { spawn: spawnChat } = useChatAgent();
+  const { spawn: spawnEmail } = useEmailAgent();
 
   const handleSubmit = async () => {
     const text = input.trim();
@@ -72,7 +74,7 @@ export default function CommandPalette() {
           } else if (planAgent === "placements") {
             spawnPlacements();
           } else if (planAgent === "email") {
-            _spawnResponseWindow(response, "Email", "📧");
+            spawnEmail();
           } else if (planAgent === "calendar") {
             _spawnResponseWindow(response, "Calendar", "📅");
           } else if (planAgent === "whatsapp") {

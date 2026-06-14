@@ -10,9 +10,12 @@ interface TopBarProps {
   onNotificationClick: () => void;
   onSyncClick: () => void;
   syncStatus: "idle" | "syncing" | "done" | "error";
+  onLaunchEmail?: () => void;
+  onLaunchWhatsApp?: () => void;
+  onLaunchMarks?: () => void;
 }
 
-export default function TopBar({ agentCount, notificationCount, onNotificationClick, onSyncClick, syncStatus }: TopBarProps) {
+export default function TopBar({ agentCount, notificationCount, onNotificationClick, onSyncClick, syncStatus, onLaunchEmail, onLaunchWhatsApp, onLaunchMarks }: TopBarProps) {
   const { theme, toggle } = useTheme();
   const { windows } = useWindowManager();
   const [clock, setClock] = useState("");
@@ -52,8 +55,39 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
         )}
       </div>
 
-      {/* Right: Sync + Clock + Notification + Theme */}
+      {/* Right: Launchers + Sync + Clock + Notification + Theme */}
       <div className="flex items-center gap-3">
+        {/* Quick launcher buttons */}
+        <div className="hidden md:flex items-center gap-1">
+          {onLaunchEmail && (
+            <button
+              onClick={onLaunchEmail}
+              className="px-2 py-1 rounded text-[11px] bg-surface hover:bg-surface-hover text-secondary hover:text-foreground transition-colors"
+              title="Open Email Intelligence"
+            >
+              📧 Email
+            </button>
+          )}
+          {onLaunchWhatsApp && (
+            <button
+              onClick={onLaunchWhatsApp}
+              className="px-2 py-1 rounded text-[11px] bg-surface hover:bg-surface-hover text-secondary hover:text-foreground transition-colors"
+              title="Open WhatsApp Messages"
+            >
+              💬 WhatsApp
+            </button>
+          )}
+          {onLaunchMarks && (
+            <button
+              onClick={onLaunchMarks}
+              className="px-2 py-1 rounded text-[11px] bg-surface hover:bg-surface-hover text-secondary hover:text-foreground transition-colors"
+              title="Open GPA Projection"
+            >
+              📊 Marks
+            </button>
+          )}
+        </div>
+
         {/* VTOP Sync button */}
         <button
           onClick={onSyncClick}

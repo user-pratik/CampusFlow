@@ -90,7 +90,7 @@ export default function FloatingDock({ activePanel, openPanel, onSync, syncing }
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-end gap-1 px-3 py-2 rounded-2xl border border-[var(--border-glass)] bg-[var(--dock-bg)] backdrop-blur-xl shadow-lg"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-end gap-1 px-3 py-2 rounded-2xl border border-[var(--border-glass)] bg-[var(--dock-bg)] backdrop-blur-xl saturate-[1.8] shadow-[0_0_0_1px_var(--border-glass)]"
     >
       {DOCK_ITEMS.map((item) => (
         <DockIcon
@@ -103,7 +103,7 @@ export default function FloatingDock({ activePanel, openPanel, onSync, syncing }
       ))}
 
       {/* Divider */}
-      <div className="w-px h-8 bg-[var(--border-glass)] mx-1 self-center" />
+      <div className="w-px h-8 bg-[var(--dock-separator)] mx-1 self-center" />
 
       {/* Sync button */}
       <motion.button

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import PolygonBackground from "@/components/PolygonBackground";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
       className={`${inter.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+        <PolygonBackground />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

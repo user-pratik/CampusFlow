@@ -138,10 +138,16 @@ class TimetableSlot(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     day: str = ""  # Day of week (may be empty for VIT slot-based system)
+    day_of_week: str = ""  # Alias for compatibility
     slot: str = ""  # VIT slot code e.g. "A1+TA1", "L31+L32"
+    slot_name: str = ""  # Alias for slot
     course_code: str = ""
-    course_type: str = "TH"  # TH, ETH, LAB
+    course_name: str = ""  # Course title
+    course_type: str | None = "TH"  # TH, ETH, LAB
     venue: str | None = None
+    start_time: str | None = None
+    end_time: str | None = None
+    semester_id: str | None = None
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 

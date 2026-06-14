@@ -57,7 +57,7 @@ export default function PanelOverlay({ type, data, onClose }: PanelOverlayProps)
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 z-40 h-full w-full max-w-[420px] flex flex-col border-l border-[var(--border-glass)] bg-[var(--bg-surface)]/95 backdrop-blur-xl shadow-2xl"
+            className="fixed top-0 right-0 z-40 h-full w-full max-w-[420px] flex flex-col border-l border-[var(--border-glass)] bg-[var(--bg-surface)] backdrop-blur-xl saturate-[1.8] shadow-[0_0_0_1px_var(--border-glass)]"
           >
             {/* Header */}
             <div className="h-14 flex items-center justify-between px-5 border-b border-[var(--border-glass)] shrink-0">
