@@ -49,31 +49,43 @@ export default function CommandPalette() {
       const response = data.response || "";
 
       // Route based on the intent returned by the backend
-      // Spawn the specialized window AND show the text response in it
+      // Use workflow_plan.agent for precise routing when available
+      const planAgent = data.workflow_plan?.agent || "";
+
       switch (intent) {
         case "attendance_risk":
           spawnAttendance();
           break;
         case "academic":
-          // If the response mentions GPA/CGPA, open GPA window; else open a chat with the response
-          if (/cgpa|gpa|grade|projection/i.test(data.sub_intent || "")) {
+          if (planAgent === "gpa_projection") {
             spawnGPA();
           } else {
-            // Generic academic response — show in a chat window
             _spawnResponseWindow(response, "Academic Agent", "📊");
           }
           break;
         case "connector":
-          // Determine sub-type from sub_intent
-          if (/timetable|schedule|class|slot/i.test(data.sub_intent || "")) {
+          // Route based on the exact agent from the planner, not regex on sub_intent
+          if (planAgent === "timetable") {
             spawnTimetable("today");
-          } else if (/deadline|due|submission/i.test(data.sub_intent || "")) {
+          } else if (planAgent === "deadlines") {
             spawnDeadlines();
-          } else if (/placement|drive|company/i.test(data.sub_intent || "")) {
+          } else if (planAgent === "placements") {
             spawnPlacements();
+          } else if (planAgent === "email") {
+            _spawnResponseWindow(response, "Email", "📧");
+          } else if (planAgent === "calendar") {
+            _spawnResponseWindow(response, "Calendar", "📅");
+          } else if (planAgent === "whatsapp") {
+            _spawnResponseWindow(response, "Messages", "💬");
           } else {
-            _spawnResponseWindow(response, "Connector Agent", "🔗");
+            _spawnResponseWindow(response, "Info", "🔗");
           }
+          break;
+        case "action":
+          _spawnResponseWindow(response, "Action Agent", "⚡");
+          break;
+        case "schedule":
+          _spawnResponseWindow(response, "Schedule Agent", "📅");
           break;
         case "general":
         default:
