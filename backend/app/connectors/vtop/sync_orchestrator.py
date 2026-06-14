@@ -434,36 +434,6 @@ class SyncOrchestrator:
             data["total_credits"],
         )
 
-<<<<<<< HEAD
-    async def _persist_timetable(self, records: list[dict], semester_id: str) -> None:
-        """Persist timetable slots to DB, clearing old slots for this semester first.
-
-        Skips if records list is empty (preserve existing data).
-        """
-        if not records:
-            logger.info("No timetable records to persist — preserving existing data.")
-            return
-
-        async with async_session_maker() as session:
-            # Clear old timetable for this semester
-            await session.exec(
-                delete(TimetableSlot).where(TimetableSlot.semester_id == semester_id)
-            )
-            for rec in records:
-                session.add(TimetableSlot(
-                    semester_id=semester_id,
-                    day_of_week=rec["day_of_week"],
-                    start_time=rec["start_time"],
-                    end_time=rec["end_time"],
-                    course_code=rec["course_code"],
-                    course_name=rec["course_name"],
-                    slot_type=rec["slot_type"],
-                    venue=rec["venue"],
-                    updated_at=datetime.utcnow(),
-                ))
-            await session.commit()
-        logger.info("Persisted %d timetable slots for semester %s.", len(records), semester_id)
-=======
     async def _scrape_timetable(self, semester_id: str) -> list[dict] | None:
         """Scrape timetable for a semester.
 
@@ -524,7 +494,6 @@ class SyncOrchestrator:
                 ))
             await session.commit()
         logger.info("Persisted %d timetable entries.", len(records))
->>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)
 
     async def close(self) -> None:
         """Close the underlying HTTP client."""

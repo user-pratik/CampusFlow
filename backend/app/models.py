@@ -132,24 +132,16 @@ class EmailNotification(SQLModel, table=True):
 
 
 class TimetableSlot(SQLModel, table=True):
-<<<<<<< HEAD
-    """A single timetable slot scraped from VTOP StudentTimeTableChn."""
-=======
-    """A single timetable slot (day + time + course)."""
->>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)
+    """A single timetable slot scraped from VTOP."""
 
     __tablename__ = "timetable_slots"
 
     id: int | None = Field(default=None, primary_key=True)
-<<<<<<< HEAD
-    semester_id: str = Field(index=True)
-    day_of_week: str  # Monday, Tuesday, etc.
-    start_time: str  # HH:MM
-    end_time: str  # HH:MM
-    course_code: str = Field(index=True)
-    course_name: str
-    slot_type: str  # "theory" or "lab"
-    venue: str
+    day: str = ""  # Day of week (may be empty for VIT slot-based system)
+    slot: str = ""  # VIT slot code e.g. "A1+TA1", "L31+L32"
+    course_code: str = ""
+    course_type: str = "TH"  # TH, ETH, LAB
+    venue: str | None = None
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -167,7 +159,7 @@ class Notification(SQLModel, table=True):
     source_agent: str  # e.g. "Attendance Agent", "Deadline Agent"
     priority: str = Field(default="normal")  # "low", "normal", "high", "urgent"
     is_read: bool = Field(default=False, index=True)
-    link: str | None = None  # Optional deep-link or action identifier
+    link: str | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -175,7 +167,7 @@ class Notification(SQLModel, table=True):
 
 
 class Deadline(SQLModel, table=True):
-    """Aggregated deadline from various sources (Gmail, manual calendar/regulations)."""
+    """Aggregated deadline from various sources."""
 
     __tablename__ = "deadlines"
 
@@ -183,10 +175,10 @@ class Deadline(SQLModel, table=True):
     source: str  # "gmail" or "manual"
     title: str
     due_datetime: datetime
-    category: str  # "fee", "placement", "exam", "academic", "event", etc.
+    category: str  # "fee", "placement", "exam", "academic", "event"
     status: str = Field(default="upcoming")  # "upcoming", "completed", "missed"
-    source_ref_id: str | None = Field(default=None, index=True)  # gmail_msg_id or manual entry key
-    calendar_event_id: str | None = Field(default=None)  # Google Calendar event ID once synced
+    source_ref_id: str | None = Field(default=None, index=True)
+    calendar_event_id: str | None = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -201,16 +193,16 @@ class PlacementDrive(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     company_name: str
     drive_date: datetime | None = None
-    rounds: str = Field(default="[]")  # JSON array of round types e.g. ["aptitude","coding","interview"]
-    status: str = Field(default="upcoming")  # "upcoming", "applied", "completed", "missed"
+    rounds: str = Field(default="[]")
+    status: str = Field(default="upcoming")
     applied: bool = Field(default=False)
-    source_email_id: str | None = Field(default=None, unique=True, index=True)  # gmail_msg_id
-    role: str | None = None  # Job role/title
-    package: str | None = None  # CTC / stipend info
-    eligibility: str | None = None  # Raw eligibility text from email
-    eligible_degree: str | None = None  # e.g. "BTech CSE", "BTech IT/CSE/ECE"
-    eligible_batch: str | None = None  # e.g. "2027", "2026/2027"
-    min_cgpa: float | None = None  # Minimum CGPA required
+    source_email_id: str | None = Field(default=None, unique=True, index=True)
+    role: str | None = None
+    package: str | None = None
+    eligibility: str | None = None
+    eligible_degree: str | None = None
+    eligible_batch: str | None = None
+    min_cgpa: float | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -221,13 +213,5 @@ class PrepChecklist(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     drive_id: int = Field(foreign_key="placement_drives.id", index=True)
-    items: str = Field(default="[]")  # JSON array of {task, completed, round_type}
+    items: str = Field(default="[]")
     created_at: datetime = Field(default_factory=datetime.utcnow)
-=======
-    day: str  # Monday, Tuesday, etc.
-    slot: str  # Time slot name or range
-    course_code: str
-    course_type: str = "TH"  # TH, ETH, LO, LI, SS, LAB
-    venue: str | None = None
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
->>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)

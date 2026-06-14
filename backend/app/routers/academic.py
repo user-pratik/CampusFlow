@@ -91,14 +91,9 @@ async def get_available_semesters():
         await orchestrator.close()
 
 
-<<<<<<< HEAD
 @router.get("/attendance/risk")
 async def get_attendance_risk(session: AsyncSession = Depends(get_session)):
-    """Compute attendance risk per course from stored Attendance data.
-
-    Returns list of risk assessments with current_percentage, max_skippable,
-    classes_needed_to_reach_75, and risk_level (safe/warning/critical).
-    """
+    """Compute attendance risk per course from stored Attendance data."""
     from app.agents.attendance_risk_agent import calculate_risk
 
     result = await session.exec(select(Attendance).order_by(Attendance.course_code))
@@ -135,17 +130,13 @@ async def get_cgpa_projection(
     credits: int = Query(default=3, description="Course credit weight"),
     session: AsyncSession = Depends(get_session),
 ):
-    """Project new CGPA if a specific grade is achieved in one course.
-
-    What-if analysis: "If I get grade Y in course X, what's my new CGPA?"
-    """
+    """Project new CGPA if a specific grade is achieved in one course."""
     from app.agents.gpa_projection_agent import VALID_GRADES, project_cgpa
 
     grade_upper = grade.upper().strip()
     if grade_upper not in VALID_GRADES:
         return {"error": f"Invalid grade '{grade}'. Valid: {VALID_GRADES}"}
 
-    # Load current academic profile
     result = await session.exec(
         select(AcademicProfile).order_by(AcademicProfile.updated_at.desc()).limit(1)
     )
@@ -170,13 +161,9 @@ async def get_required_grades(
     target_cgpa: float = Query(..., description="Desired CGPA target (e.g. 8.5)"),
     session: AsyncSession = Depends(get_session),
 ):
-    """Determine what grades are needed in current-semester courses to reach target CGPA.
-
-    Uses stored CourseMark data to identify this semester's courses and their credit load.
-    """
+    """Determine what grades are needed in current-semester courses to reach target CGPA."""
     from app.agents.gpa_projection_agent import compute_required_grades
 
-    # Load current academic profile
     result = await session.exec(
         select(AcademicProfile).order_by(AcademicProfile.updated_at.desc()).limit(1)
     )
@@ -188,25 +175,21 @@ async def get_required_grades(
     if target_cgpa < 0 or target_cgpa > 10:
         return {"error": "Target CGPA must be between 0 and 10."}
 
-    # Get distinct courses from current marks (these are this semester's courses)
     marks_result = await session.exec(select(CourseMark))
     all_marks = marks_result.all()
 
-    # Deduplicate by course_code, default 3 credits per course
     seen: dict[str, dict] = {}
     for mark in all_marks:
         if mark.course_code not in seen:
             seen[mark.course_code] = {
                 "course_code": mark.course_code,
-                "credits": 3,  # Default; could be enhanced with a credits table
+                "credits": 3,
             }
 
     remaining_courses = list(seen.values())
 
     if not remaining_courses:
-        return {
-            "error": "No course marks found for current semester. Sync VTOP first.",
-        }
+        return {"error": "No course marks found for current semester. Sync VTOP first."}
 
     result_data = compute_required_grades(
         current_cgpa=profile.cgpa,
@@ -216,7 +199,8 @@ async def get_required_grades(
     )
 
     return result_data.model_dump()
-=======
+
+
 @router.get("/academic/timetable")
 async def get_timetable(session: AsyncSession = Depends(get_session)):
     """Return the student's weekly timetable."""
@@ -225,7 +209,6 @@ async def get_timetable(session: AsyncSession = Depends(get_session)):
     if not slots:
         return {"message": "No timetable data. Sync VTOP to load."}
 
-    # Group by day for frontend convenience
     from collections import defaultdict
     by_day = defaultdict(list)
     for slot in slots:
@@ -237,4 +220,3 @@ async def get_timetable(session: AsyncSession = Depends(get_session)):
         })
 
     return {"timetable": dict(by_day)}
->>>>>>> 804c408 (feat: WhatsApp n8n integration, timetable sync, attendance rules fix, VTOP enhancements)
