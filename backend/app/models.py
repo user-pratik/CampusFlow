@@ -105,3 +105,24 @@ class VTOPSessionRecord(SQLModel, table=True):
     established_at: datetime = Field(default_factory=datetime.utcnow)
     last_validated_at: datetime | None = Field(default=None)
     is_valid: bool = Field(default=True)
+
+
+# ─── Gmail Integration ────────────────────────────────────────────────────────
+
+
+class EmailNotification(SQLModel, table=True):
+    """Classified email notification from Gmail."""
+
+    __tablename__ = "email_notifications"
+
+    id: int | None = Field(default=None, primary_key=True)
+    gmail_msg_id: str = Field(unique=True, index=True)
+    subject: str | None = None
+    sender: str | None = None
+    received_at: datetime | None = None
+    category: str | None = None
+    priority: str | None = None
+    summary: str | None = None
+    is_read: bool = Field(default=False)
+    raw_body: str | None = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)

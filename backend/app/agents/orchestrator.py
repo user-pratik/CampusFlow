@@ -38,13 +38,14 @@ Return ONLY a JSON object with:
 {
   "intent": "<one of: academic, schedule, action, connector, general>",
   "sub_intent": "<more specific description of what user wants>",
-  "requires_context": ["marks", "attendance", "tasks", "events", "profile", "history", "regulations"],
+  "requires_context": ["marks", "attendance", "tasks", "events", "profile", "history", "regulations", "emails"],
   "confidence": <0.0 to 1.0>
 }
 
 The "requires_context" field should list what data the specialist agent will need.
 If the query builds on previous conversation (e.g., "create a schedule based on that"), include "history".
 If the query is about messages, emails, or calendar, use "connector" intent.
+If the query mentions emails, inbox, mail, placement mail, CDC, fee notice — include "emails" in requires_context.
 If the query mentions academic rules, policies, FFCS, grading, credits, attendance rules, exams schedule, withdrawal, include "regulations" in requires_context.
 """
 
@@ -175,7 +176,7 @@ class OrchestratorAgent(BaseAgent):
         """Gather all required context data from DB and memory."""
         from app.database import async_session_maker
         from sqlmodel import select
-        from app.models import Attendance, CourseMark, AcademicProfile, Task, Event, Notice
+        from app.models import Attendance, CourseMark, AcademicProfile, Task, Event, Notice, EmailNotification
 
         context: dict = {}
 
@@ -257,6 +258,27 @@ class OrchestratorAgent(BaseAgent):
                         "overall_attendance": profile.overall_attendance,
                         "semester_name": profile.semester_name,
                     }
+
+            if "emails" in requires:
+                result = await session.exec(
+                    select(EmailNotification)
+                    .order_by(EmailNotification.received_at.desc())
+                    .limit(30)
+                )
+                emails = result.all()
+                context["emails"] = [
+                    {
+                        "from": e.sender,
+                        "subject": e.subject,
+                        "date": e.received_at.isoformat() if e.received_at else "",
+                        "category": e.category,
+                        "priority": e.priority,
+                        "summary": e.summary,
+                        "body": e.raw_body[:500] if e.raw_body else "",
+                        "is_read": e.is_read,
+                    }
+                    for e in emails
+                ]
 
         if "history" in requires:
             context["conversation_summary"] = self.memory.get_summary(session_id)

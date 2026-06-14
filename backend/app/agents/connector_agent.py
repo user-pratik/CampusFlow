@@ -107,11 +107,12 @@ class ConnectorAgent(BaseAgent):
         history = payload["history"]
         profile = payload["profile"]
         sub_intent = payload.get("sub_intent", "")
+        context = payload.get("context", {})
 
         # Build context strings
         whatsapp_groups = self._format_groups()
         whatsapp_messages = self._format_messages(user_message)
-        emails = self._format_emails(user_message)
+        emails = self._format_emails(user_message, context.get("emails"))
         calendar = self._format_calendar()
         timetable = self._format_timetable()
         academic_calendar = self._format_academic_calendar()
@@ -221,10 +222,41 @@ class ConnectorAgent(BaseAgent):
             )
         return "\n\n".join(lines) if lines else "No recent messages."
 
-    def _format_emails(self, query: str) -> str:
-        """Format emails, prioritizing relevant ones."""
-        emails = self._email_data.get("emails", [])
+    def _format_emails(self, query: str, db_emails: list[dict] | None = None) -> str:
+        """Format emails, using real DB emails if available, falling back to fabricated data."""
         q = query.lower()
+
+        # Use real emails from DB if available
+        if db_emails:
+            # Filter based on query keywords
+            if "unread" in q:
+                filtered = [e for e in db_emails if not e.get("is_read")]
+            elif "placement" in q or "job" in q or "intern" in q or "cdc" in q:
+                filtered = [e for e in db_emails if e.get("category") == "PLACEMENT"]
+            elif "exam" in q or "result" in q or "marks" in q:
+                filtered = [e for e in db_emails if e.get("category") == "EXAM"]
+            elif "fee" in q or "payment" in q:
+                filtered = [e for e in db_emails if e.get("category") == "FEE"]
+            elif "event" in q or "fest" in q or "workshop" in q:
+                filtered = [e for e in db_emails if e.get("category") == "EVENT"]
+            else:
+                filtered = db_emails[:10]
+
+            lines = []
+            for e in filtered[:10]:
+                status = "📩 UNREAD" if not e.get("is_read") else "📧"
+                lines.append(
+                    f"{status} From: {e.get('from', 'Unknown')}\n"
+                    f"  Subject: {e.get('subject', 'No subject')}\n"
+                    f"  Date: {e.get('date', '')[:10]}\n"
+                    f"  Category: {e.get('category', '?')} | Priority: {e.get('priority', '?')}\n"
+                    f"  Summary: {e.get('summary', '')}\n"
+                    f"  Body: {e.get('body', '')[:400]}"
+                )
+            return "\n\n".join(lines) if lines else "No matching emails found."
+
+        # Fallback to fabricated data
+        emails = self._email_data.get("emails", [])
 
         # Filter based on query keywords
         if "unread" in q:

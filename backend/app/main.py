@@ -19,7 +19,7 @@ import httpx
 from app.database import init_db
 from app.scheduler import start_scheduler, stop_scheduler
 from app.startup import run_startup_orchestrator, shutdown_ngrok
-from app.routers import profile, notices, tasks, digest, webhooks, academic, chat, vtop_proxy
+from app.routers import profile, notices, tasks, digest, webhooks, academic, chat, vtop_proxy, gmail
 
 # Import models to ensure they are registered with SQLModel metadata before init_db runs
 import app.models  # noqa: F401
@@ -101,3 +101,4 @@ app.include_router(webhooks.router, prefix="/api")
 app.include_router(academic.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(vtop_proxy.router)
+app.include_router(gmail.router, prefix="/api")
