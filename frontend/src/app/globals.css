@@ -6,7 +6,7 @@
   --surface-hover: #EBEDF0;
   --foreground: #111827;
   --secondary: #6B7280;
-  --accent: #4F46E5;
+  --accent: #5a52e0;
   --accent-light: #EEF2FF;
   --conflict: #FEF08A;
   --urgent: #DC2626;
@@ -15,23 +15,43 @@
   --panel-bg: #FFFFFF;
   --chat-user: #EEF2FF;
   --chat-ai: #F9FAFB;
+
+  /* New design tokens */
+  --bg-base: #f4f4f8;
+  --bg-surface: #ffffff;
+  --bg-glass: rgba(0, 0, 0, 0.03);
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --accent-glow: rgba(90, 82, 224, 0.2);
+  --text-primary: #0a0a0f;
+  --text-muted: #6b6b80;
+  --dock-bg: rgba(255, 255, 255, 0.85);
 }
 
 .dark {
-  --background: #0F1117;
-  --surface: #1A1D27;
-  --surface-hover: #242834;
-  --foreground: #F1F3F5;
+  --background: #0a0a0f;
+  --surface: #12121a;
+  --surface-hover: #1c1c2a;
+  --foreground: #f0f0f5;
   --secondary: #9CA3AF;
-  --accent: #818CF8;
-  --accent-light: #1E1B4B;
+  --accent: #6c63ff;
+  --accent-light: #1a1840;
   --conflict: #854D0E;
   --urgent: #EF4444;
   --success: #34D399;
-  --border: #2D3142;
-  --panel-bg: #161922;
-  --chat-user: #1E1B4B;
-  --chat-ai: #1A1D27;
+  --border: #1f1f30;
+  --panel-bg: #12121a;
+  --chat-user: #1a1840;
+  --chat-ai: #12121a;
+
+  /* New design tokens */
+  --bg-base: #0a0a0f;
+  --bg-surface: #12121a;
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --accent-glow: rgba(108, 99, 255, 0.3);
+  --text-primary: #f0f0f5;
+  --text-muted: #6b6b80;
+  --dock-bg: rgba(18, 18, 26, 0.85);
 }
 
 @theme inline {
