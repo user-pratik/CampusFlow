@@ -94,39 +94,64 @@ def parse_marks(soup: BeautifulSoup) -> list[dict]:
 def parse_academic_history(soup: BeautifulSoup) -> dict:
     """Parse the grade history page for CGPA and total credits.
 
+    The VTOP grade history page has a summary table where:
+    - First row contains headings (including "Credits Earned" and "CGPA")
+    - Second row contains the values
+
     Returns:
         Dict with: cgpa (float), total_credits (int)
     """
     result = {"cgpa": 0.0, "total_credits": 0}
 
-    # Look for CGPA in the page text
-    text = soup.get_text()
+    # Strategy 1: Look in tables for heading row with "CGPA" or "Credits Earned"
+    # This matches the Android app's approach (find last table with 'credits' heading)
+    tables = soup.find_all("table")
+    for table in reversed(tables):  # Search from last table (summary is typically at bottom)
+        rows = table.find_all("tr")
+        if len(rows) < 2:
+            continue
 
-    cgpa_match = re.search(r"CGPA[:\s]*(\d+\.?\d*)", text, re.I)
-    if cgpa_match:
-        result["cgpa"] = float(cgpa_match.group(1))
+        # Get headings from first row
+        headings = [td.get_text(strip=True).lower() for td in rows[0].find_all("td")]
+        if not headings:
+            headings = [th.get_text(strip=True).lower() for th in rows[0].find_all("th")]
 
-    credits_match = re.search(r"(?:Total\s+)?Credits?\s*(?:Earned)?[:\s]*(\d+)", text, re.I)
-    if credits_match:
-        result["total_credits"] = int(credits_match.group(1))
+        if not any("credit" in h or "cgpa" in h for h in headings):
+            continue
 
-    # Fallback: look in tables
+        # Found the summary table — extract values from second row
+        values = [td.get_text(strip=True) for td in rows[1].find_all("td")]
+
+        for i, heading in enumerate(headings):
+            if i < len(values):
+                if "cgpa" in heading:
+                    try:
+                        result["cgpa"] = float(values[i])
+                    except (ValueError, IndexError):
+                        pass
+                elif "earned" in heading or ("credit" in heading and "registered" not in heading):
+                    try:
+                        result["total_credits"] = int(values[i])
+                    except (ValueError, IndexError):
+                        pass
+
+        if result["cgpa"] > 0:
+            break
+
+    # Strategy 2: Regex fallback on page text
     if result["cgpa"] == 0.0:
-        tables = soup.find_all("table")
-        for table in tables:
-            for row in table.find_all("tr"):
-                cells = [td.get_text(strip=True) for td in row.find_all("td")]
-                for i, cell in enumerate(cells):
-                    if "cgpa" in cell.lower() and i + 1 < len(cells):
-                        try:
-                            result["cgpa"] = float(cells[i + 1])
-                        except ValueError:
-                            pass
-                    if "credit" in cell.lower() and i + 1 < len(cells):
-                        try:
-                            result["total_credits"] = int(cells[i + 1])
-                        except ValueError:
-                            pass
+        text = soup.get_text()
+        cgpa_match = re.search(r"CGPA[:\s]*(\d+\.?\d*)", text, re.I)
+        if cgpa_match:
+            result["cgpa"] = float(cgpa_match.group(1))
+
+    if result["total_credits"] == 0:
+        text = soup.get_text()
+        credits_match = re.search(r"(?:Total\s+)?Credits?\s*(?:Earned)?[:\s]*(\d+)", text, re.I)
+        if credits_match:
+            result["total_credits"] = int(credits_match.group(1))
+
+    logger.info("Parsed academic profile: CGPA=%.2f, Credits=%d", result["cgpa"], result["total_credits"])
 
     logger.info("Parsed academic profile: CGPA=%.2f, Credits=%d", result["cgpa"], result["total_credits"])
     return result

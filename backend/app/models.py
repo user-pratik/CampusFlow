@@ -91,3 +91,17 @@ class AcademicProfile(SQLModel, table=True):
     overall_attendance: float | None = None  # percentage
     semester_name: str | None = None
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+# ─── Phase 7: Embedded VTOP Login ─────────────────────────────────────────────
+
+
+class VTOPSessionRecord(SQLModel, table=True):
+    __tablename__ = "vtop_sessions"
+
+    id: int | None = Field(default=None, primary_key=True)
+    cookies_json: str  # JSON-serialized cookie list [{name, value, domain, path}]
+    csrf_token: str | None = Field(default=None)
+    established_at: datetime = Field(default_factory=datetime.utcnow)
+    last_validated_at: datetime | None = Field(default=None)
+    is_valid: bool = Field(default=True)

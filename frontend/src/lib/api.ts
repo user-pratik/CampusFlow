@@ -241,3 +241,27 @@ export async function clearChatHistory(
   if (!res.ok) throw new Error("Failed to clear history");
   return res.json();
 }
+
+// ─── VTOP Proxy / Sync (new) ─────────────────────────────────────────────────
+
+export async function checkSessionStatus(): Promise<{ status: "valid" | "session_expired" | "no_session" | "validation_failed" }> {
+  const res = await fetch(`${BASE}/api/vtop/session-status`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to check session status");
+  return res.json();
+}
+
+export async function fetchVtopSemesters(): Promise<{ semesters: Record<string, string> }> {
+  const res = await fetch(`${BASE}/api/vtop/semesters`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch semesters");
+  return res.json();
+}
+
+export async function triggerVtopSyncNew(semesterId: string): Promise<{ status: string; attendance_count?: number; marks_count?: number }> {
+  const res = await fetch(`${BASE}/api/vtop/sync`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ semester_id: semesterId }),
+  });
+  if (!res.ok) throw new Error("Sync failed");
+  return res.json();
+}
