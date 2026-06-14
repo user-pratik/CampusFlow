@@ -57,3 +57,6 @@ htmlcov/
 # ─── Misc ─────────────────────────────────────────────────────────────────────
 sample_payload.json
 *.log
+"backend/credentials.json" 
+"backend/gmail_token.json" 
+"backend/vtop_session.json" 
