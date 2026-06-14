@@ -54,7 +54,7 @@ export default function SetupFlow({ onComplete }: Props) {
   }, []);
 
   const runSetup = async () => {
-    const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const BASE = "";  // Use relative URL — Next.js rewrites proxy to backend
 
     // ─── Step 1: VTOP Login ────────────────────────────────────────────
     setCurrentStep(0);

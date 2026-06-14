@@ -17,3 +17,5 @@ pytest-asyncio
 hypothesis
 pyngrok
 playwright
+google.auth
+python-dateutil

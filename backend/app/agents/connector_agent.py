@@ -7,10 +7,14 @@ This agent acts as if it has direct access to the student's:
 
 It uses fabricated data from backend/data/fabricated/ to simulate real access.
 When real integrations are live, this agent swaps to real data sources.
+
+Includes an eligibility pre-filter for placement emails that cross-checks
+job criteria (degree, branch, batch, CGPA) against the user's academic profile.
 """
 
 import json
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -38,6 +42,13 @@ You are CampusFlow's Communication & Calendar agent for {name}, a {branch} stude
 You have DIRECT ACCESS to their WhatsApp groups, email inbox, and calendar. You can see all their 
 messages, emails, and upcoming events. Answer as if you are reading their phone right now.
 
+STUDENT ACADEMIC PROFILE (use for eligibility checks):
+- Degree: {degree}
+- Branch/Specialization: {specialization}
+- Admission Year: {admission_year} | Passing Year: {passing_year}
+- Current CGPA: {cgpa}
+- Semester: {semester}
+
 IMPORTANT BEHAVIOR:
 - When asked about a subject group, find messages from that group and summarize them naturally
 - When asked "any new messages?", show the most recent/important ones across all groups
@@ -48,6 +59,19 @@ IMPORTANT BEHAVIOR:
 - Don't say "I don't have access" — you DO have access to everything below
 - If someone in a group offered to form a study group, mention that specifically
 - Sound natural, like you're looking at their phone: "I see a message from Prof. Venkatesh in your Embedded Systems group..."
+
+PLACEMENT / JOB ELIGIBILITY RULES:
+- When the user asks about jobs, placements, or eligibility, ALWAYS check the email body for criteria
+  (degree level, branch, CGPA cutoff, batch/passing year) and compare against the student's profile above.
+- For EACH placement opportunity, clearly tag it as:
+  ✅ Eligible — criteria match the student's profile
+  ⚠️ Unclear — criteria not fully specified, advise verifying
+  ❌ Likely Not Eligible — criteria conflict (e.g., MTech-only for a BTech student, wrong batch year, CGPA below cutoff)
+- PROACTIVELY flag mismatches in the FIRST response. Do NOT wait for the user to ask.
+- If eligibility data is pre-computed (see ELIGIBILITY TAGS below), use it directly.
+
+ELIGIBILITY TAGS (pre-computed for placement emails):
+{eligibility_tags}
 
 WHATSAPP GROUPS THE STUDENT IS PART OF:
 {whatsapp_groups}
@@ -107,14 +131,20 @@ class ConnectorAgent(BaseAgent):
         history = payload["history"]
         profile = payload["profile"]
         sub_intent = payload.get("sub_intent", "")
+        context = payload.get("context", {})
 
         # Build context strings
         whatsapp_groups = self._format_groups()
         whatsapp_messages = self._format_messages(user_message)
-        emails = self._format_emails(user_message)
+        emails = self._format_emails(user_message, context.get("emails"))
         calendar = self._format_calendar()
         timetable = self._format_timetable()
         academic_calendar = self._format_academic_calendar()
+
+        # Eligibility pre-filter for placement queries
+        eligibility_tags = self._compute_eligibility_tags(
+            user_message, context.get("emails"), profile, context
+        )
 
         history_text = "\n".join(
             f"{m['role'].upper()}: {m['content'][:300]}" for m in history[-8:]
@@ -124,6 +154,13 @@ class ConnectorAgent(BaseAgent):
             name=profile.get("name", "Student"),
             branch=profile.get("branch", "CS"),
             college=profile.get("college", "VIT"),
+            degree=profile.get("degree", "BTech"),
+            specialization=profile.get("specialization", profile.get("branch", "CS")),
+            admission_year=profile.get("admission_year", "N/A"),
+            passing_year=profile.get("passing_year", "N/A"),
+            cgpa=profile.get("cgpa", context.get("academic_profile", {}).get("cgpa", "N/A")),
+            semester=profile.get("semester", "N/A"),
+            eligibility_tags=eligibility_tags,
             whatsapp_groups=whatsapp_groups,
             whatsapp_messages=whatsapp_messages,
             emails=emails,
@@ -221,10 +258,56 @@ class ConnectorAgent(BaseAgent):
             )
         return "\n\n".join(lines) if lines else "No recent messages."
 
-    def _format_emails(self, query: str) -> str:
-        """Format emails, prioritizing relevant ones."""
-        emails = self._email_data.get("emails", [])
+    def _format_emails(self, query: str, db_emails: list[dict] | None = None) -> str:
+        """Format emails, using real DB emails if available, falling back to fabricated data.
+        
+        Re-classifies emails in real-time to avoid stale DB categories from old classifier.
+        """
+        from app.connectors.gmail.email_classifier import classify_email as reclassify
+
         q = query.lower()
+
+        # Use real emails from DB if available
+        if db_emails:
+            # Re-classify each email in real-time for accurate filtering
+            reclassified_emails = []
+            for e in db_emails:
+                live = reclassify(
+                    e.get("subject", ""),
+                    e.get("from", e.get("sender", "")),
+                    e.get("body", e.get("raw_body", "")),
+                )
+                reclassified_emails.append({**e, "category": live["category"], "priority": live["priority"]})
+
+            # Filter based on query keywords using LIVE classification
+            if "unread" in q:
+                filtered = [e for e in reclassified_emails if not e.get("is_read")]
+            elif "placement" in q or "job" in q or "intern" in q or "cdc" in q:
+                filtered = [e for e in reclassified_emails if e.get("category") == "PLACEMENT"]
+            elif "exam" in q or "result" in q or "marks" in q:
+                filtered = [e for e in reclassified_emails if e.get("category") == "EXAM"]
+            elif "fee" in q or "payment" in q:
+                filtered = [e for e in reclassified_emails if e.get("category") == "FEE"]
+            elif "event" in q or "fest" in q or "workshop" in q:
+                filtered = [e for e in reclassified_emails if e.get("category") == "EVENT"]
+            else:
+                filtered = reclassified_emails[:10]
+
+            lines = []
+            for e in filtered[:10]:
+                status = "📩 UNREAD" if not e.get("is_read") else "📧"
+                lines.append(
+                    f"{status} From: {e.get('from', 'Unknown')}\n"
+                    f"  Subject: {e.get('subject', 'No subject')}\n"
+                    f"  Date: {e.get('date', '')[:10]}\n"
+                    f"  Category: {e.get('category', '?')} | Priority: {e.get('priority', '?')}\n"
+                    f"  Summary: {e.get('summary', '')}\n"
+                    f"  Body: {e.get('body', '')[:400]}"
+                )
+            return "\n\n".join(lines) if lines else "No matching emails found."
+
+        # Fallback to fabricated data
+        emails = self._email_data.get("emails", [])
 
         # Filter based on query keywords
         if "unread" in q:
@@ -337,6 +420,232 @@ class ConnectorAgent(BaseAgent):
                 {"label": "Check messages", "type": "navigate", "payload": "whatsapp"},
                 {"label": "Show calendar", "type": "navigate", "payload": "calendar"},
             ]
+
+    # ------------------------------------------------------------------
+    # Eligibility Pre-Filter for Placement Emails
+    # ------------------------------------------------------------------
+
+    def _compute_eligibility_tags(
+        self,
+        user_message: str,
+        db_emails: list[dict] | None,
+        profile: dict,
+        context: dict,
+    ) -> str:
+        """For placement-related queries, pre-compute eligibility for each opportunity.
+
+        Re-classifies emails in real-time using the current classifier logic,
+        then extracts degree/branch/batch/CGPA criteria from email bodies and
+        compares against the user's academic profile.
+
+        Returns a formatted string of eligibility tags for the LLM prompt.
+        """
+        from app.connectors.gmail.email_classifier import classify_email as reclassify
+
+        q = user_message.lower()
+
+        # Only run eligibility check for placement-related queries
+        if not any(kw in q for kw in ["job", "placement", "eligible", "apply", "intern", "cdc", "hiring", "opportunity"]):
+            return "N/A — not a placement query."
+
+        # Gather user profile fields
+        user_degree = profile.get("degree", "BTech").lower()
+        user_branch = profile.get("branch", "Computer Science").lower()
+        user_specialization = profile.get("specialization", "").lower()
+        user_passing_year = profile.get("passing_year", 2027)
+        user_cgpa = float(
+            profile.get("cgpa", 0)
+            or context.get("academic_profile", {}).get("cgpa", 0)
+            or 0
+        )
+
+        # Get ALL emails and re-classify them in real-time
+        # This ensures we don't rely on stale DB categories
+        placement_emails = []
+        if db_emails:
+            for e in db_emails:
+                live_class = reclassify(
+                    e.get("subject", ""),
+                    e.get("from", e.get("sender", "")),
+                    e.get("body", e.get("raw_body", "")),
+                )
+                if live_class["category"] == "PLACEMENT":
+                    placement_emails.append(e)
+
+        if not placement_emails:
+            # Try fabricated data
+            fab_emails = self._email_data.get("emails", [])
+            placement_emails = [
+                e for e in fab_emails
+                if e.get("category", "").lower() == "placement"
+            ]
+
+        if not placement_emails:
+            return "No genuine placement emails found in your inbox."
+
+        tags = []
+        for email in placement_emails[:10]:
+            subject = email.get("subject", "")
+            body = email.get("body", email.get("preview", email.get("body_text", email.get("raw_body", ""))))
+            text = f"{subject} {body}".lower()
+
+            eligibility = self._check_single_eligibility(
+                text, user_degree, user_branch, user_specialization,
+                user_passing_year, user_cgpa,
+            )
+            tags.append(f"• [{eligibility['status']}] {subject[:80]} — {eligibility['reason']}")
+
+        return "\n".join(tags) if tags else "No genuine placement emails found."
+
+    def _check_single_eligibility(
+        self,
+        email_text: str,
+        user_degree: str,
+        user_branch: str,
+        user_specialization: str,
+        user_passing_year: int,
+        user_cgpa: float,
+    ) -> dict:
+        """Check eligibility for a single placement email.
+
+        Returns:
+            {"status": "✅ Eligible" | "❌ Likely Not Eligible" | "⚠️ Unclear — Verify",
+             "reason": str}
+        """
+        conflicts = []
+        matches = []
+        unclear = []
+
+        # --- Degree level check ---
+        # Look for explicit degree mentions with context
+        degree_indicators = {
+            "mtech": [r"\bm\.?tech\b", r"\bmaster", r"\bpg\b", r"\bpost.?graduat"],
+            "btech": [r"\bb\.?tech\b", r"\bbachelor", r"\bug\b", r"\bundergraduat"],
+            "phd": [r"\bph\.?d\b", r"\bdoctoral"],
+            "mba": [r"\bmba\b", r"\bm\.b\.a\b"],
+        }
+
+        found_degrees = set()
+        for deg, patterns in degree_indicators.items():
+            for pat in patterns:
+                if re.search(pat, email_text):
+                    found_degrees.add(deg)
+                    break
+
+        if found_degrees:
+            if user_degree in found_degrees:
+                matches.append(f"Degree: {user_degree.upper()} ✓")
+            elif len(found_degrees) == 1:
+                # Only one degree mentioned and it's not ours
+                other_deg = list(found_degrees)[0]
+                conflicts.append(f"Targets {other_deg.upper()} (you are {user_degree.upper()})")
+            else:
+                # Multiple degrees mentioned — check if ours is included
+                if user_degree not in found_degrees:
+                    # Check for exclusive language
+                    exclusive = any(
+                        re.search(rf"(only|exclusively)\s*(for\s*)?(pg|m\.?tech|master)", email_text)
+                        for _ in [1]
+                    ) if "mtech" in found_degrees else False
+                    if exclusive:
+                        conflicts.append(f"Exclusively for PG/MTech (you are {user_degree.upper()})")
+                    else:
+                        unclear.append(f"Multiple degree levels mentioned ({'/'.join(d.upper() for d in found_degrees)}) — verify")
+
+        # --- Batch / Passing year check ---
+        # Look for year patterns in context of batch/passing/graduating
+        year_patterns = [
+            re.compile(r"(20\d{2})\s*(batch|passing|passout|pass out|graduate|graduating)"),
+            re.compile(r"batch\s*(?:of\s*)?(20\d{2})"),
+            re.compile(r"(20\d{2})\s*(?:and|&|/)\s*(20\d{2})\s*batch"),
+            re.compile(r"passing year[:\s]*(20\d{2})"),
+        ]
+
+        found_years = set()
+        for pat in year_patterns:
+            for match in pat.finditer(email_text):
+                for group in match.groups():
+                    if group and group.isdigit() and 2020 <= int(group) <= 2030:
+                        found_years.add(int(group))
+
+        if found_years:
+            if user_passing_year in found_years:
+                matches.append(f"Batch {user_passing_year} ✓")
+            else:
+                conflicts.append(
+                    f"Targets {'/'.join(str(y) for y in sorted(found_years))} batch "
+                    f"(you are {user_passing_year})"
+                )
+
+        # --- CGPA check ---
+        cgpa_pattern = re.compile(
+            r"(?:cgpa|gpa|aggregate)\s*(?:>=?|above|minimum|min|of|:|should be)\s*(\d+\.?\d*)",
+            re.IGNORECASE,
+        )
+        cgpa_matches = cgpa_pattern.findall(email_text)
+        if cgpa_matches and user_cgpa > 0:
+            required_cgpa = max(float(c) for c in cgpa_matches)
+            if user_cgpa >= required_cgpa:
+                matches.append(f"CGPA {user_cgpa} >= {required_cgpa} ✓")
+            else:
+                conflicts.append(f"Requires CGPA >= {required_cgpa} (yours: {user_cgpa})")
+
+        # --- Branch check ---
+        branch_keywords = {
+            "cse": [r"\bcse\b", r"\bcomputer science\b", r"\bcs\b"],
+            "ece": [r"\bece\b", r"\belectronics\b", r"\belectrical\b"],
+            "mech": [r"\bmechanical\b", r"\bmech\b"],
+            "civil": [r"\bcivil\b"],
+            "it": [r"\binformation technology\b"],
+            "ai": [r"\bai\b", r"\bartificial intelligence\b", r"\bmachine learning\b", r"\bml\b", r"\bai\s*&\s*ml\b"],
+        }
+
+        found_branches = set()
+        for branch, patterns in branch_keywords.items():
+            for pat in patterns:
+                if re.search(pat, email_text):
+                    found_branches.add(branch)
+                    break
+
+        if found_branches:
+            # Check if "all branches" or "open to all" overrides
+            if re.search(r"(all branch|open to all|any branch)", email_text):
+                matches.append("Open to all branches ✓")
+            else:
+                user_branches = set()
+                for branch, patterns in branch_keywords.items():
+                    for pat in patterns:
+                        if re.search(pat, user_branch) or re.search(pat, user_specialization):
+                            user_branches.add(branch)
+                            break
+
+                if user_branches & found_branches:
+                    matches.append(f"Branch match ✓")
+                else:
+                    unclear.append(f"Listed branches: {'/'.join(b.upper() for b in found_branches)} — verify eligibility")
+
+        # --- Decision ---
+        if conflicts:
+            return {
+                "status": "❌ Likely Not Eligible",
+                "reason": "; ".join(conflicts),
+            }
+        elif matches and not unclear:
+            return {
+                "status": "✅ Eligible",
+                "reason": "; ".join(matches),
+            }
+        elif matches and unclear:
+            return {
+                "status": "⚠️ Unclear — Verify",
+                "reason": "; ".join(matches + unclear),
+            }
+        else:
+            # No criteria found — default to UNCLEAR, not eligible
+            return {
+                "status": "⚠️ Unclear — Verify",
+                "reason": "No explicit eligibility criteria found — check the email details",
+            }
 
     def _build_panel_data(self, message: str, sub_intent: str) -> dict | None:
         """Build structured data for frontend widgets."""

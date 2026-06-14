@@ -222,8 +222,11 @@ class AcademicAgent(BaseAgent):
         if att:
             parts.append("\nATTENDANCE RULES:")
             parts.append(f"  Minimum: {att.get('minimum_required', 75)}%")
+            parts.append(f"  Rule: {att.get('minimum_required_note', 'N/A')}")
             parts.append(f"  Consequence: {att.get('consequence', 'Debarred from exams')}")
             parts.append(f"  9-Pointer Exemption: {att.get('nine_pointer_exemption', 'N/A')}")
+            parts.append(f"  Condonation: {att.get('condonation', 'N/A')}")
+            parts.append(f"  Medical: {att.get('medical', 'N/A')}")
 
         # Assessment
         assess = regs.get("assessment", {})

@@ -57,3 +57,7 @@ htmlcov/
 # ─── Misc ─────────────────────────────────────────────────────────────────────
 sample_payload.json
 *.log
+
+# ─── Google OAuth / Secrets ───────────────────────────────────────────────────
+backend/credentials.json
+backend/gmail_token.json

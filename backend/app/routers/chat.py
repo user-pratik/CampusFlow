@@ -24,6 +24,7 @@ class ChatRequest(BaseModel):
     """Request body for the chat endpoint."""
     message: str
     session_id: str = "default"
+    window_context: dict | None = None  # {agent: str, data: dict} for in-window follow-ups
 
 
 class ChatResponse(BaseModel):
@@ -41,21 +42,14 @@ class ChatResponse(BaseModel):
 async def chat(request: ChatRequest) -> ChatResponse:
     """Process a user message through the agentic pipeline.
 
-    The orchestrator:
-    1. Classifies intent (academic, schedule, action, general)
-    2. Gathers relevant context from DB
-    3. Routes to specialist agent
-    4. Maintains conversation memory for multi-turn interactions
-
-    Examples:
-        - "What are my marks in probability?" → AcademicAgent
-        - "Create a study schedule for me" → ScheduleAgent
-        - "Set an alarm for 7am tomorrow" → ActionAgent
-        - "Hey, how's it going?" → General handler
+    If window_context is provided, the message is treated as a follow-up
+    within a specific agent window — skipping intent classification and
+    routing directly to the relevant agent with the window's current data.
     """
     result = await _orchestrator.execute({
         "user_message": request.message,
         "session_id": request.session_id,
+        "window_context": request.window_context,
     })
 
     return ChatResponse(
@@ -101,3 +95,61 @@ async def clear_chat_history(session_id: str) -> dict:
     """Clear conversation history for a session."""
     _orchestrator.memory.clear_session(session_id)
     return {"status": "cleared", "session_id": session_id}
+
+
+# ─── Lightweight Intent Classification Endpoint ───────────────────────────────
+
+
+class ClassifyRequest(BaseModel):
+    """Request body for intent classification."""
+    message: str
+
+
+class ClassifyResponse(BaseModel):
+    """Response with routing decision for the frontend."""
+    agent: str  # attendance_risk, gpa_projection, deadlines, placements, timetable, regulations, chat
+    action: str  # spawn_window, chat_only, spawn_and_answer
+    confidence: float
+    reasoning: str
+
+
+@router.post("/chat/classify", response_model=ClassifyResponse)
+async def classify_intent(request: ClassifyRequest) -> ClassifyResponse:
+    """Classify user message intent using the LLM workflow planner.
+
+    Returns which agent window to spawn (or chat fallback) without
+    actually executing the agent — used by the frontend command palette
+    to decide routing before committing to a window.
+    """
+    from app.agents.workflow_planner import USE_WORKFLOW_PLANNER, plan_workflow
+
+    if USE_WORKFLOW_PLANNER:
+        plan = await plan_workflow(request.message, [])
+        return ClassifyResponse(
+            agent=plan.agent,
+            action=plan.action,
+            confidence=plan.confidence,
+            reasoning=plan.reasoning,
+        )
+    else:
+        # Fallback: use the legacy classifier
+        classification = await _orchestrator._classify_intent(request.message, [])
+        intent = classification.get("intent", "general")
+        confidence = classification.get("confidence", 0.5)
+
+        # Map legacy intents to agent names
+        agent_map = {
+            "academic": "gpa_projection",
+            "attendance_risk": "attendance_risk",
+            "connector": "chat",
+            "schedule": "chat",
+            "action": "chat",
+            "general": "chat",
+        }
+
+        return ClassifyResponse(
+            agent=agent_map.get(intent, "chat"),
+            action="spawn_window" if confidence >= 0.7 and intent not in ("general", "action") else "chat_only",
+            confidence=confidence,
+            reasoning=classification.get("sub_intent", ""),
+        )

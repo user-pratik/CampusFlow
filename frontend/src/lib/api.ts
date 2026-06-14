@@ -2,9 +2,46 @@
  * CampusFlow API client.
  * Real data: VTOP (attendance, marks, academic profile, semesters, sync), notices, tasks, digest, profile
  * Fabricated: WhatsApp messages, emails, calendar, suggested groups, timetable (from mockData.json)
+ *
+ * Uses relative URLs to leverage Next.js rewrites (next.config.ts proxies /api/* to the backend).
+ * This eliminates port mismatch issues — the browser always talks to the Next.js server
+ * on its own origin, and Next.js forwards requests to http://localhost:8000 server-side.
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE = "";
+
+// ─── Safe Fetch Wrapper ──────────────────────────────────────────────────────
+
+/**
+ * A fetch wrapper that catches network errors (backend unreachable) and returns
+ * a structured error instead of throwing an unhandled TypeError.
+ */
+export async function safeFetch(
+  url: string,
+  options?: RequestInit
+): Promise<{ ok: true; data: Response } | { ok: false; error: string }> {
+  try {
+    const res = await fetch(url, { cache: "no-store", ...options });
+    if (!res.ok) {
+      return { ok: false, error: `Server error (${res.status}: ${res.statusText})` };
+    }
+    return { ok: true, data: res };
+  } catch {
+    return { ok: false, error: "Unable to reach backend — is it running?" };
+  }
+}
+
+/**
+ * Check if the backend is reachable via the Next.js proxy.
+ */
+export async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const res = await fetch(`/health`, { cache: "no-store" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 // ─── Real Backend Types ──────────────────────────────────────────────────────
 
@@ -239,5 +276,29 @@ export async function clearChatHistory(
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to clear history");
+  return res.json();
+}
+
+// ─── VTOP Proxy / Sync (new) ─────────────────────────────────────────────────
+
+export async function checkSessionStatus(): Promise<{ status: "valid" | "session_expired" | "no_session" | "validation_failed" }> {
+  const res = await fetch(`${BASE}/api/vtop/session-status`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to check session status");
+  return res.json();
+}
+
+export async function fetchVtopSemesters(): Promise<{ semesters: Record<string, string> }> {
+  const res = await fetch(`${BASE}/api/vtop/semesters`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch semesters");
+  return res.json();
+}
+
+export async function triggerVtopSyncNew(semesterId: string): Promise<{ status: string; attendance_count?: number; marks_count?: number }> {
+  const res = await fetch(`${BASE}/api/vtop/sync`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ semester_id: semesterId }),
+  });
+  if (!res.ok) throw new Error("Sync failed");
   return res.json();
 }

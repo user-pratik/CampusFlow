@@ -19,7 +19,7 @@ import httpx
 from app.database import init_db
 from app.scheduler import start_scheduler, stop_scheduler
 from app.startup import run_startup_orchestrator, shutdown_ngrok
-from app.routers import profile, notices, tasks, digest, webhooks, academic, chat
+from app.routers import profile, notices, tasks, digest, webhooks, academic, chat, vtop_proxy, gmail, timetable, notifications, deadlines, placements
 
 # Import models to ensure they are registered with SQLModel metadata before init_db runs
 import app.models  # noqa: F401
@@ -57,7 +57,7 @@ async def health():
 async def service_status():
     """Return status of all connected services (ngrok, WhatsApp, VTOP)."""
     from app.startup import get_ngrok_url, EVOLUTION_BASE, EVOLUTION_API_KEY, INSTANCE_NAME
-    from pathlib import Path
+    from app.connectors.vtop.session_store import SessionStore
 
     status = {
         "ngrok": {"active": False, "url": None},
@@ -84,9 +84,10 @@ async def service_status():
     except Exception:
         pass
 
-    # VTOP session
-    session_file = Path(__file__).resolve().parent.parent / "vtop_session.json"
-    status["vtop"]["session_valid"] = session_file.exists()
+    # VTOP session - use DB-based SessionStore
+    session_store = SessionStore()
+    active_session = await session_store.get_active_session()
+    status["vtop"]["session_valid"] = active_session is not None
 
     return status
 
@@ -99,3 +100,9 @@ app.include_router(digest.router, prefix="/api")
 app.include_router(webhooks.router, prefix="/api")
 app.include_router(academic.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(vtop_proxy.router)
+app.include_router(gmail.router, prefix="/api")
+app.include_router(timetable.router, prefix="/api")
+app.include_router(notifications.router, prefix="/api")
+app.include_router(deadlines.router, prefix="/api")
+app.include_router(placements.router, prefix="/api")

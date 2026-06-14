@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "./ThemeProvider";
 import { PanelType } from "@/lib/types";
-import { fetchProfile, fetchAcademicProfile, fetchServiceStatus, triggerFullSetup, type Profile, type AcademicProfileData, type ServiceStatus } from "@/lib/api";
+import { fetchProfile, fetchAcademicProfile, fetchServiceStatus, checkSessionStatus, triggerVtopSyncNew, type Profile, type AcademicProfileData, type ServiceStatus } from "@/lib/api";
+import VTOPLoginModal from "./VTOPLoginModal";
+import SemesterSelector from "./SemesterSelector";
 
 interface SidebarProps {
   openPanel: (type: PanelType, data?: Record<string, unknown>) => void;
@@ -17,6 +19,8 @@ export default function Sidebar({ openPanel, activePanel }: SidebarProps) {
   const [status, setStatus] = useState<ServiceStatus | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSemesterSelector, setShowSemesterSelector] = useState(false);
 
   useEffect(() => {
     fetchProfile().then(setProfile).catch(() => {});
@@ -36,30 +40,35 @@ export default function Sidebar({ openPanel, activePanel }: SidebarProps) {
     setSyncing(true);
     setSyncResult(null);
     try {
-      const result = await triggerFullSetup();
-      const vtopLogin = result.vtop_login;
-      const vtopSync = result.vtop_sync;
-      const whatsapp = result.whatsapp;
-
-      if (vtopSync === "completed") {
-        setSyncResult("✓ Synced");
-        fetchAcademicProfile().then(setAcademic).catch(() => {});
-      } else if (vtopLogin === "browser_launched") {
-        setSyncResult("🌐 Browser opened");
-      } else if (vtopLogin === "session_valid") {
-        setSyncResult("✓ Synced");
-        fetchAcademicProfile().then(setAcademic).catch(() => {});
+      const sessionStatus = await checkSessionStatus();
+      if (sessionStatus.status === "valid") {
+        setShowSemesterSelector(true);
       } else {
-        setSyncResult("⚠ Check browser");
+        setShowLoginModal(true);
       }
-
-      // Refresh status
-      fetchServiceStatus().then(setStatus).catch(() => {});
     } catch {
       setSyncResult("✗ Offline");
+      setSyncing(false);
+      setTimeout(() => setSyncResult(null), 4000);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    setShowSemesterSelector(true);
+  };
+
+  const handleSemesterConfirm = async (semesterId: string) => {
+    setShowSemesterSelector(false);
+    try {
+      await triggerVtopSyncNew(semesterId);
+      setSyncResult("✓ Synced");
+      fetchAcademicProfile().then(setAcademic).catch(() => {});
+    } catch {
+      setSyncResult("✗ Failed");
     } finally {
       setSyncing(false);
-      setTimeout(() => setSyncResult(null), 6000);
+      setTimeout(() => setSyncResult(null), 4000);
     }
   };
 
@@ -173,6 +182,19 @@ export default function Sidebar({ openPanel, activePanel }: SidebarProps) {
           </span>
         </button>
       </div>
+
+      {showLoginModal && (
+        <VTOPLoginModal
+          onClose={() => { setShowLoginModal(false); setSyncing(false); }}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
+      {showSemesterSelector && (
+        <SemesterSelector
+          onClose={() => { setShowSemesterSelector(false); setSyncing(false); }}
+          onConfirm={handleSemesterConfirm}
+        />
+      )}
     </aside>
   );
 }

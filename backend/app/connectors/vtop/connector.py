@@ -1,3 +1,7 @@
+# ⚠️ DEPRECATED: VTOPConnector uses browser-based scraping (Playwright).
+# Use SyncOrchestrator from sync_orchestrator.py instead.
+# This file is kept for reference/backward compatibility only.
+
 """VTOP Connector — orchestrates browser-based scraping and data persistence."""
 
 import logging
@@ -5,7 +9,8 @@ from datetime import datetime
 
 from sqlmodel import delete
 
-from app.connectors.vtop.browser_scraper import VTOPBrowserScraper
+# DEPRECATED: Browser scraper no longer imported in active code paths
+# from app.connectors.vtop.browser_scraper import VTOPBrowserScraper
 from app.database import async_session_maker
 from app.models import AcademicProfile, Attendance, CourseMark
 
@@ -13,9 +18,15 @@ logger = logging.getLogger(__name__)
 
 
 class VTOPConnector:
-    """Full connector: browser login → scrape → persist academic data."""
+    """Full connector: browser login → scrape → persist academic data.
+    
+    ⚠️ DEPRECATED: Use SyncOrchestrator instead. This class is kept for
+    backward compatibility with vtop_sync_worker.py only.
+    """
 
     def __init__(self):
+        # Lazy import to avoid pulling playwright into active code paths
+        from app.connectors.vtop.browser_scraper import VTOPBrowserScraper
         self.scraper = VTOPBrowserScraper()
         self._semester_id: str | None = None
         self._semester_name: str | None = None

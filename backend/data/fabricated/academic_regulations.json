@@ -1,6 +1,4 @@
 {
-  "_comment": "VIT Chennai Academic Calendar & FFCS v4.0 Regulations. Used by the academic agent for regulation-aware answers.",
-
   "calendar": {
     "semester": "Winter 2025-2026",
     "commencement": "2025-12-04",
@@ -16,80 +14,90 @@
     "summer_semester_start": "2026-05-11",
     "fall_2026_27_start": "2026-07-13"
   },
-
   "registration": {
     "min_credits": 16,
     "max_credits": 27,
     "average_credits": 23,
-    "graduating_exception": "Can register <16 credits",
-    "low_cgpa_restriction": "CGPA <4.0 restricted to max 16 credits",
-    "add_drop_window": "First 3 instructional days",
-    "withdrawal": "3 days after CAT-I results (Grade 'W'). Cannot withdraw below 16 credits.",
-    "backlogs": "F (Fail) or N (Not Complete/Debarred) requires re-registration",
-    "categories": {
-      "FC": "Foundation Core",
-      "DC": "Discipline Core",
-      "DE": "Discipline Elective",
-      "OE": "Open Elective"
-    }
+    "graduating_exception": "Graduating students can register for fewer than 16 credits.",
+    "low_cgpa_restriction": "Students with CGPA < 4.0 restricted to max 16 credits.",
+    "add_drop_window": "First 3 instructional days of the semester.",
+    "withdrawal": "Allowed for 3 days after CAT-I results are published. Grade 'W' is recorded. Cannot withdraw below 16 credits.",
+    "backlogs": "'F' (Fail) or 'N' (Not Complete/Debarred) requires re-registration in next available semester.",
+    "categories": "FC (Foundation Core), DC (Discipline Core), DE (Discipline Elective), OE (Open Elective)"
   },
-
   "attendance": {
     "minimum_required": 75,
-    "unit": "percent",
-    "consequence": "Below 75% = debarred from writing exams for that course",
-    "nine_pointer_exemption": "Students with CGPA >= 9.0 and no backlogs are exempted from 75% rule (dynamically calculated per exam)"
+    "minimum_required_note": "75% minimum attendance per course is required to be eligible to write exams (CAT and FAT).",
+    "nine_pointer_exemption": "YES — Students with CGPA >= 9.0 AND no active backlogs are EXEMPTED from the 75% attendance rule. Their eligibility is dynamically calculated per exam.",
+    "nine_pointer_exemption_applies": true,
+    "nine_pointer_cgpa_threshold": 9.0,
+    "nine_pointer_requires_no_backlogs": true,
+    "consequence": "Students below 75% attendance (who don't qualify for the 9-pointer exemption) are NOT permitted to write the FAT for that course. Grade 'N' (Not Complete/Debarred) is awarded, equivalent to 0 grade points.",
+    "condonation": "There is NO general condonation of attendance. The 75% rule is strictly enforced unless the 9-pointer exemption applies.",
+    "cgpa_exemption": "Students with CGPA >= 9.0 and no backlogs are exempted from the 75% attendance requirement. This is the ONLY CGPA-based exemption.",
+    "calculation": "Attendance = (Classes Attended / Total Classes Conducted) × 100, calculated per course independently.",
+    "lab_vs_theory": "Attendance is tracked separately for theory and lab components. Both must independently meet 75% (unless 9-pointer exemption applies).",
+    "on_duty": "OD (On Duty) for university-approved activities counts as attendance. Must be approved by Dean/HoD in advance.",
+    "medical": "No automatic condonation for medical leave. Even with documentation, if attendance falls below 75% without the 9-pointer exemption, the student may be debarred."
   },
-
   "assessment": {
-    "split": "60% CAM (Continuous Assessment) + 40% FAT (Final Assessment Test)",
+    "split": "60% CAM (Continuous Assessment Mode) + 40% FAT (Final Assessment Test)",
     "cam_breakdown": {
-      "cat1": { "weightage_pct": 15, "notes": "Regular exam" },
-      "cat2": { "weightage_pct": 15, "notes": "Open Book exam" },
-      "digital_assignments": { "weightage_pct": 30, "notes": "Assignments throughout semester" }
+      "cat1": { "weightage_pct": 15, "format": "Closed book, 1.5 hours" },
+      "cat2": { "weightage_pct": 15, "format": "Open book, 1.5 hours" },
+      "digital_assignments": { "weightage_pct": 30, "format": "Quizzes, assignments via VIT LMS/VTOP" }
     },
+    "fat_format": "Closed book, 3 hours, 40% weightage",
     "passing_criteria": {
       "theory_fat_minimum": 40,
       "lab_project_minimum": 50,
       "overall_minimum": 50,
-      "unit": "percent"
-    },
-    "grades": {
-      "S": { "points": 10, "absolute_min": 90 },
-      "A": { "points": 9, "absolute_min": 80 },
-      "B": { "points": 8, "absolute_min": 70 },
-      "C": { "points": 7, "absolute_min": 60 },
-      "D": { "points": 6, "absolute_min": 55 },
-      "E": { "points": 5, "absolute_min": 50 },
-      "F": { "points": 0, "meaning": "Fail" },
-      "N": { "points": 0, "meaning": "Debarred/Incomplete" }
+      "note": "Must score >= 40% in Theory FAT, >= 50% in Lab/Project, AND >= 50% overall (CAM+FAT) to pass."
     },
     "grading_system": {
-      "relative": "Used for theory classes with >10 students",
-      "absolute": "Used for labs, projects, soft skills, and classes <=10 students"
+      "relative": "Used for theory courses with >10 students. Class average = midpoint of B grade.",
+      "absolute": "Used for labs, projects, soft skills, and courses with <=10 students. S>=90, A>=80, B>=70, C>=60, D>=55, E>=50.",
+      "grade_points": { "S": 10, "A": 9, "B": 8, "C": 7, "D": 6, "E": 5, "F": 0, "N": 0 },
+      "s_grade_rule": "To get S in relative grading: score >= (Mean + 1.5 × Std Dev) AND >= 90% absolute. If no one qualifies, max 3 students (or top 5%) get S.",
+      "n_grade": "'N' grade is awarded when debarred from FAT due to attendance shortage or academic malpractice. Equivalent to 0 grade points."
+    },
+    "hackathon_bonus": "Up to 20 bonus CAM marks for participation in 24+ hour Hackathons/Make-a-thons."
+  },
+  "projects_internships": {
+    "industrial_internship": "Mandatory 4-week internship after year 1.",
+    "final_project": {
+      "eligibility": "Allowed in pre-final semester if 65% of total credits are completed.",
+      "evaluation": "3 reviews: 1st Review (5%), 2nd Review (40%), 3rd Review/FAT Viva (50%).",
+      "credits": 12
     }
   },
-
-  "projects_internships": {
-    "industrial_internship": "Mandatory 4-week internship after year 1",
-    "final_project": {
-      "eligibility": "Allowed in pre-final sem if 65% of credits are met",
-      "evaluation": {
-        "review_1": 5,
-        "review_2": 40,
-        "review_3_viva": 50,
-        "attendance": 5
-      }
-    },
-    "hackathon_bonus": "Up to 20 bonus CAM marks for 24+ hour Hackathons/Make-a-thons"
-  },
-
   "credentials": {
     "minors_honours": {
       "additional_credits_required": 18,
-      "minimum_cgpa_in_those_courses": 7.5
+      "minimum_cgpa_in_those_courses": 7.5,
+      "note": "Requires 18 additional credits and average CGPA >= 7.5 in those specific courses."
     },
-    "course_substitution": "Failed DE/OE can be substituted with another from same basket (costs a fee)",
-    "grade_improvement": "Can re-register a passed course to improve grade (max 1 per semester, unless graduating)"
+    "course_substitution": "Failed DE/OE courses can be substituted with another from the same basket (costs a fee).",
+    "grade_improvement": "Can re-register a passed course to improve the grade. Max 1 per semester, unless graduating.",
+    "audit_courses": "B.Tech students with CGPA >= 8.0 can audit up to 2 courses total. 'U' grade, does not affect CGPA.",
+    "pg_courses": "UG students with CGPA >= 8.0 can register for PG-level courses under OE option.",
+    "ug_research": "Students can take 3-credit research/project courses (TARP, Design Project, Simulation Project) to fulfill DE/OE requirements."
+  },
+  "exam_absences": {
+    "re_cat": "Permitted for approved internships, fellowships, placement activities, or hospitalization.",
+    "re_fat": "Granted ONLY for hospitalization (>1 week) or family death. Must apply within 14 days of the FAT."
+  },
+  "re_evaluation": {
+    "process": "Pay to view FAT answer scripts. Apply for re-evaluation.",
+    "threshold": "If marks change by >5%, a third examiner checks (best of 3 taken).",
+    "appeal": "Final disputes escalated to the Examination Appellate Committee."
+  },
+  "prerequisites_retakes": {
+    "prerequisite_fail": "If a student fails a prerequisite course ('F'), they ARE still permitted to register for the next level course.",
+    "component_retake": "If 'N' grade because one component failed (e.g. passed theory, failed lab), only re-register the failed component. If 'F' (whole course fail), must re-register all components."
+  },
+  "malpractice": {
+    "cat_cheating": "0 marks for ALL subjects registered that semester for that exam component.",
+    "fat_cheating": "'N' grade for ALL regular courses taken that semester."
   }
 }

@@ -179,6 +179,16 @@ class ActionAgent(BaseAgent):
         saved_actions = []
         for action in actions:
             saved = self._save_action(action)
+
+            # If it's a calendar event, also create it in Google Calendar
+            if action.get("type") == "calendar_event":
+                gcal_result = await self._create_google_calendar_event(action.get("data", {}))
+                if gcal_result and "link" in gcal_result:
+                    saved["calendar_link"] = gcal_result["link"]
+                    confirmation = result.get("confirmation_message", "")
+                    if confirmation and "link" not in confirmation.lower():
+                        result["confirmation_message"] = f"{confirmation}\n📅 Calendar link: {gcal_result['link']}"
+
             saved_actions.append(saved)
 
         confirmation = result.get(
@@ -309,3 +319,44 @@ class ActionAgent(BaseAgent):
             return True
         except Exception:
             return False
+
+    async def _create_google_calendar_event(self, data: dict) -> dict | None:
+        """Create a Google Calendar event from action data.
+
+        Args:
+            data: Dict with title, date, start_time, end_time, location, description.
+
+        Returns:
+            Result dict from calendar API, or None on failure.
+        """
+        try:
+            from app.connectors.gmail.calendar_client import create_calendar_event
+
+            title = data.get("title", "Event")
+            date = data.get("date", "")
+            time = data.get("start_time", data.get("time", "09:00"))
+            description = data.get("description", "")
+            location = data.get("location", "")
+
+            if not date:
+                logger.warning("No date provided for calendar event: %s", title)
+                return None
+
+            result = create_calendar_event(
+                title=title,
+                date=date,
+                time=time,
+                description=description,
+                location=location,
+            )
+
+            if "error" in result:
+                logger.warning("Calendar event creation failed: %s", result["error"])
+                return None
+
+            logger.info("Created Google Calendar event: %s on %s", title, date)
+            return result
+
+        except Exception as e:
+            logger.warning("Failed to create Google Calendar event: %s", e)
+            return None

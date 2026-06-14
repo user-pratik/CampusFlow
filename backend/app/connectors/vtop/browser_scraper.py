@@ -1,3 +1,8 @@
+# ⚠️ DEPRECATED: VTOPBrowserScraper is no longer used in the active sync flow.
+# The new HTTP-based SyncOrchestrator (sync_orchestrator.py) replaces all
+# browser-based scraping with plain httpx requests using captured cookies.
+# This file is kept for reference/fallback only.
+
 """Playwright-based VTOP scraper — replicates the Android app's jQuery AJAX approach.
 
 Uses saved session cookies + Playwright to load the VTOP content page,

@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Semester Fee Payment Due",
+    "due_date": "2026-07-15",
+    "category": "fee"
+  },
+  {
+    "title": "Course Withdrawal Deadline",
+    "due_date": "2026-07-20",
+    "category": "academic"
+  },
+  {
+    "title": "CAT-1 Exams Begin",
+    "due_date": "2026-07-28",
+    "category": "exam"
+  },
+  {
+    "title": "CAT-2 Exams Begin",
+    "due_date": "2026-09-08",
+    "category": "exam"
+  },
+  {
+    "title": "FAT Lab Exams Begin",
+    "due_date": "2026-10-13",
+    "category": "exam"
+  },
+  {
+    "title": "FAT Theory Exams Begin",
+    "due_date": "2026-10-20",
+    "category": "exam"
+  }
+]
