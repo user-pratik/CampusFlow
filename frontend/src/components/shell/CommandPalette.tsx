@@ -1,14 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useWindowManager } from "@/lib/windowManager";
-import { useAttendanceRiskAgent } from "./AttendanceRiskAgentWindow";
-import { useTimetableAgent } from "./TimetableAgentWindow";
-import { useGPAAgent } from "./GPAAgentWindow";
-import { useDeadlineAgent } from "./DeadlineAgentWindow";
-import { usePlacementAgent } from "./PlacementAgentWindow";
 import { useChatAgent } from "./ChatAgentWindow";
 import { useEmailAgent } from "./EmailAgentWindow";
+import { useWhatsAppAgent } from "./WhatsAppAgentWindow";
+import { chatBus } from "@/lib/chatBus";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -16,14 +12,9 @@ export default function CommandPalette() {
   const [input, setInput] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const { spawnWindow } = useWindowManager();
-  const { spawn: spawnAttendance } = useAttendanceRiskAgent();
-  const { spawn: spawnTimetable } = useTimetableAgent();
-  const { spawn: spawnGPA } = useGPAAgent();
-  const { spawn: spawnDeadlines } = useDeadlineAgent();
-  const { spawn: spawnPlacements } = usePlacementAgent();
   const { spawn: spawnChat } = useChatAgent();
   const { spawn: spawnEmail } = useEmailAgent();
+  const { spawn: spawnWhatsApp } = useWhatsAppAgent();
 
   const handleSubmit = async () => {
     const text = input.trim();
@@ -32,89 +23,21 @@ export default function CommandPalette() {
     setInput("");
     setProcessing(true);
 
-    try {
-      // Single API call — gets both the classification AND the response
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, session_id: "command_palette" }),
-      });
-
-      if (!res.ok) {
-        spawnChat(text);
-        setProcessing(false);
-        return;
-      }
-
-      const data = await res.json();
-      const intent = data.intent || "general";
-      const response = data.response || "";
-
-      // Route based on the intent returned by the backend
-      // Use workflow_plan.agent for precise routing when available
-      const planAgent = data.workflow_plan?.agent || "";
-
-      switch (intent) {
-        case "attendance_risk":
-          spawnAttendance();
-          break;
-        case "academic":
-          if (planAgent === "gpa_projection") {
-            spawnGPA();
-          } else {
-            _spawnResponseWindow(response, "Academic Agent", "📊");
-          }
-          break;
-        case "connector":
-          // Route based on the exact agent from the planner, not regex on sub_intent
-          if (planAgent === "timetable") {
-            spawnTimetable("today");
-          } else if (planAgent === "deadlines") {
-            spawnDeadlines();
-          } else if (planAgent === "placements") {
-            spawnPlacements();
-          } else if (planAgent === "email") {
-            spawnEmail();
-          } else if (planAgent === "calendar") {
-            _spawnResponseWindow(response, "Calendar", "📅");
-          } else if (planAgent === "whatsapp") {
-            _spawnResponseWindow(response, "Messages", "💬");
-          } else {
-            _spawnResponseWindow(response, "Info", "🔗");
-          }
-          break;
-        case "action":
-          _spawnResponseWindow(response, "Action Agent", "⚡");
-          break;
-        case "schedule":
-          _spawnResponseWindow(response, "Schedule Agent", "📅");
-          break;
-        case "general":
-        default:
-          // Open a chat window with the response already shown
-          _spawnResponseWindow(response, "Chat", "💬");
-          break;
-      }
-    } catch {
-      spawnChat(text);
+    // Step 3: Intent keyword interception — open relevant windows alongside chat
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes("whatsapp") || lowerText.includes("messages")) {
+      spawnWhatsApp();
+    }
+    if (lowerText.includes("gmail") || lowerText.includes("email") || lowerText.includes("mail")) {
+      spawnEmail();
     }
 
-    setProcessing(false);
-  };
+    // Step 1: Open/focus the Chat window and send the message via the bus
+    spawnChat(); // Opens if not exists, focuses if already open (singleton)
+    // Small delay to ensure the Chat component is mounted and subscribed
+    setTimeout(() => chatBus.send(text), 50);
 
-  const _spawnResponseWindow = (response: string, agentName: string, icon: string) => {
-    spawnWindow(
-      agentName,
-      "Response",
-      <div className="text-[11px] text-foreground whitespace-pre-wrap leading-relaxed">
-        {response}
-      </div>,
-      {
-        agentIcon: icon,
-        size: { width: 380, height: 300 },
-        position: { x: 180, y: 100 },
-      }
-    );
+    setProcessing(false);
   };
 
   return (

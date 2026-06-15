@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWindowManager } from "@/lib/windowManager";
+import { chatBus } from "@/lib/chatBus";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,14 +47,6 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
-
-  // Send the initial message on mount if provided
-  useEffect(() => {
-    if (hasSentInitial.current || !initialMessage) return;
-    hasSentInitial.current = true;
-    sendMessage(initialMessage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialMessage]);
 
   const sendMessage = useCallback(async (text: string) => {
     const userMsg: ChatMessage = { role: "user", content: text, timestamp: new Date() };
@@ -105,6 +98,22 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
 
     setLoading(false);
   }, []);
+
+  // Send the initial message on mount if provided
+  useEffect(() => {
+    if (hasSentInitial.current || !initialMessage) return;
+    hasSentInitial.current = true;
+    sendMessage(initialMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialMessage]);
+
+  // Subscribe to global chatBus — receives messages from Command Palette
+  useEffect(() => {
+    const unsubscribe = chatBus.subscribe((msg) => {
+      sendMessage(msg);
+    });
+    return unsubscribe;
+  }, [sendMessage]);
 
   const handleSend = () => {
     const text = input.trim();
@@ -205,7 +214,7 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
  * Ensures only ONE chat window exists — focuses it if already open.
  */
 export function useChatAgent() {
-  const { spawnWindow, windows, focusWindow } = useWindowManager();
+  const { spawnWindow, windows, focusWindow, restoreWindow } = useWindowManager();
 
   const spawn = useCallback(
     (message?: string) => {
@@ -214,9 +223,20 @@ export function useChatAgent() {
         (w) => w.agentName === "Chat" && w.title === "CampusFlow Chat"
       );
       if (existing) {
-        focusWindow(existing.id);
+        // Always ensure it's open and focused (never toggle-minimize from here)
+        if (existing.state === "minimized") {
+          restoreWindow(existing.id);
+        } else {
+          focusWindow(existing.id);
+        }
         return;
       }
+
+      // Center horizontally and vertically on screen
+      const chatWidth = 400;
+      const chatHeight = 500;
+      const x = typeof window !== "undefined" ? Math.round(window.innerWidth / 2 - chatWidth / 2) : 300;
+      const y = typeof window !== "undefined" ? Math.round(window.innerHeight / 2 - chatHeight / 2) : 100;
 
       spawnWindow(
         "Chat",
@@ -224,13 +244,13 @@ export function useChatAgent() {
         <ChatWindowContent initialMessage={message} />,
         {
           agentIcon: "💬",
-          size: { width: 400, height: 500 },
-          position: { x: window.innerWidth - 430, y: 50 },
+          size: { width: chatWidth, height: chatHeight },
+          position: { x, y },
           pinned: true,
         }
       );
     },
-    [spawnWindow, windows, focusWindow]
+    [spawnWindow, windows, focusWindow, restoreWindow]
   );
 
   // Auto-spawn on first render
@@ -239,14 +259,19 @@ export function useChatAgent() {
       (w) => w.agentName === "Chat" && w.title === "CampusFlow Chat"
     );
     if (!existing) {
+      const chatWidth = 400;
+      const chatHeight = 500;
+      const x = typeof window !== "undefined" ? Math.round(window.innerWidth / 2 - chatWidth / 2) : 300;
+      const y = typeof window !== "undefined" ? Math.round(window.innerHeight / 2 - chatHeight / 2) : 100;
+
       spawnWindow(
         "Chat",
         "CampusFlow Chat",
         <ChatWindowContent />,
         {
           agentIcon: "💬",
-          size: { width: 400, height: 500 },
-          position: { x: typeof window !== "undefined" ? window.innerWidth - 430 : 500, y: 50 },
+          size: { width: chatWidth, height: chatHeight },
+          position: { x, y },
           pinned: true,
         }
       );

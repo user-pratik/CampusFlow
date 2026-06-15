@@ -60,12 +60,12 @@ export default function Dock({ onToggleAppGrid }: { onToggleAppGrid?: () => void
   const minimizedWindows = windows.filter((w) => w.state === "minimized");
 
   return (
-    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 mb-4 z-9999">
-      <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-white/10 shadow-2xl">
-        {/* Pinned app: Gmail — no colored wrapper, white bg for brand logo */}
+    <div className="fixed left-0 top-0 h-full w-4 hover:w-20 z-9999 group flex flex-col justify-center items-start">
+      <div className="flex flex-col items-center gap-2 px-2 py-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-white/10 shadow-2xl -translate-x-full group-hover:translate-x-2 transition-transform duration-300 ease-out">
+        {/* Pinned app: Gmail */}
         <button
           onClick={spawnEmail}
-          className="group relative flex flex-col items-center"
+          className="group/icon relative flex flex-col items-center"
           title="Open Gmail"
         >
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-md drop-shadow transition-transform hover:scale-110 duration-200 bg-white">
@@ -74,10 +74,10 @@ export default function Dock({ onToggleAppGrid }: { onToggleAppGrid?: () => void
           </div>
         </button>
 
-        {/* Pinned app: WhatsApp — no colored wrapper, white bg for brand logo */}
+        {/* Pinned app: WhatsApp */}
         <button
           onClick={spawnWhatsApp}
-          className="group relative flex flex-col items-center"
+          className="group/icon relative flex flex-col items-center"
           title="Open WhatsApp"
         >
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-md drop-shadow transition-transform hover:scale-110 duration-200 bg-white">
@@ -86,10 +86,10 @@ export default function Dock({ onToggleAppGrid }: { onToggleAppGrid?: () => void
           </div>
         </button>
 
-        {/* Pinned app: GPA Estimator — colored wrapper + white icon */}
+        {/* Pinned app: GPA Estimator */}
         <button
           onClick={spawnGPA}
-          className="group relative flex flex-col items-center"
+          className="group/icon relative flex flex-col items-center"
           title="Open GPA Estimator"
         >
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-md drop-shadow transition-transform hover:scale-110 duration-200 bg-gradient-to-br from-yellow-400 to-amber-600">
@@ -100,7 +100,7 @@ export default function Dock({ onToggleAppGrid }: { onToggleAppGrid?: () => void
 
         {/* Separator between pinned apps and minimized agents */}
         {minimizedWindows.length > 0 && (
-          <div className="w-px h-8 bg-white/10 mx-1" />
+          <div className="h-px w-8 bg-white/10 my-1" />
         )}
 
         {/* Minimized agent windows */}
@@ -112,19 +112,19 @@ export default function Dock({ onToggleAppGrid }: { onToggleAppGrid?: () => void
               e.preventDefault();
               closeWindow(win.id);
             }}
-            className="group relative flex flex-col items-center"
+            className="group/icon relative flex flex-col items-center"
             title={`${win.title} — ${win.agentName}\nRight-click to close`}
           >
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md drop-shadow transition-transform hover:scale-110 duration-200 ${getAgentGradient(win.agentName)}`}>
               {getAgentIcon(win.agentName, win.agentIcon)}
             </div>
             {/* Active indicator dot */}
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/80" />
+            <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white/80" />
           </button>
         ))}
 
         {/* Separator */}
-        <div className="w-px h-8 bg-white/10 mx-1" />
+        <div className="h-px w-8 bg-white/10 my-1" />
 
         {/* App Grid button (Show Applications) — frosted glass style */}
         <button

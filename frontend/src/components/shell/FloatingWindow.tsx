@@ -86,13 +86,31 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
     [win.id, win.size, focusWindow, resizeWindow]
   );
 
-  if (win.state === "minimized") return null;
+  // Determine brand-specific theme classes based on agent name
+  const agentLower = win.agentName.toLowerCase();
+  let themeClasses = "";
+  if (agentLower.includes("chat") || agentLower.includes("campusflow")) {
+    themeClasses = "border-t-2 border-t-blue-500 bg-blue-900/10";
+  } else if (agentLower.includes("whatsapp") || agentLower.includes("message")) {
+    themeClasses = "border-t-2 border-t-green-500 bg-green-900/10";
+  } else if (agentLower.includes("email") || agentLower.includes("mail") || agentLower.includes("gmail")) {
+    themeClasses = "border-t-2 border-t-red-500 bg-red-900/10";
+  } else if (agentLower.includes("schedule") || agentLower.includes("timetable") || agentLower.includes("calendar")) {
+    themeClasses = "border-t-2 border-t-orange-500 bg-orange-900/10";
+  } else if (agentLower.includes("attendance") || agentLower.includes("academic")) {
+    themeClasses = "border-t-2 border-t-purple-500 bg-purple-900/10";
+  } else if (agentLower.includes("gpa") || agentLower.includes("marks") || agentLower.includes("grade")) {
+    themeClasses = "border-t-2 border-t-yellow-500 bg-yellow-900/10";
+  }
+
+  // CSS-hide minimized windows instead of unmounting (preserves internal state like chat history)
+  const isMinimized = win.state === "minimized";
 
   return (
     <div
-      className={`absolute rounded-lg shadow-2xl border border-border bg-panel-bg flex flex-col overflow-hidden transition-shadow ${
+      className={`absolute rounded-lg shadow-2xl border border-border bg-panel-bg flex flex-col overflow-hidden transition-shadow ${themeClasses} ${
         isDragging || isResizing ? "shadow-xl ring-1 ring-accent/30" : ""
-      }`}
+      } ${isMinimized ? "hidden" : ""}`}
       style={{
         left: win.position.x,
         top: win.position.y,

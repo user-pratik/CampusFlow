@@ -5,13 +5,10 @@ import { WindowManagerProvider, useWindowManager } from "@/lib/windowManager";
 import TopBar from "./TopBar";
 import Desktop from "./Desktop";
 import AppGrid from "./AppGrid";
-import { useTimetableAgent } from "./TimetableAgentWindow";
-import { useAttendanceRiskAgent } from "./AttendanceRiskAgentWindow";
 import { useNotificationCenter } from "./NotificationCenter";
 import { useEmailAgent } from "./EmailAgentWindow";
 import { useGPAAgent } from "./GPAAgentWindow";
 import { useWhatsAppAgent } from "./WhatsAppAgentWindow";
-import { useChatAgent } from "./ChatAgentWindow";
 
 const MOCK_AGENT_COUNT = 3;
 
@@ -209,40 +206,14 @@ function SyncWindowContent({ onComplete }: { onComplete: (status: "done" | "erro
 
 function AgentShellInner() {
   const { spawnWindow } = useWindowManager();
-  const [hasSpawnedDemo, setHasSpawnedDemo] = useState(false);
   const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "done" | "error">("idle");
   const [isAppGridOpen, setIsAppGridOpen] = useState(false);
-  const { autoSpawn: autoSpawnTimetable } = useTimetableAgent();
-  const { checkAndSpawn: checkAttendanceRisk } = useAttendanceRiskAgent();
   const { unreadCount, openNotificationCenter } = useNotificationCenter();
   const { spawn: spawnEmail } = useEmailAgent();
   const { spawn: spawnGPA } = useGPAAgent();
   const { spawn: spawnWhatsApp } = useWhatsAppAgent();
-  const { autoSpawn: autoSpawnChat } = useChatAgent();
 
-  // Spawn Chat window immediately on app load (pinned, bottom-right)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      autoSpawnChat();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [autoSpawnChat]);
-
-  // Spawn Timetable Agent window on app load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      autoSpawnTimetable();
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [autoSpawnTimetable]);
-
-  // Attendance Risk Agent: check on load and spawn if warning/critical found
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      checkAttendanceRisk();
-    }, 1800);
-    return () => clearTimeout(timer);
-  }, [checkAttendanceRisk]);
+  // No auto-spawn on load — desktop starts empty
 
   const handleSyncClick = useCallback(() => {
     setSyncStatus("syncing");
@@ -261,111 +232,6 @@ function AgentShellInner() {
       }
     );
   }, [spawnWindow]);
-
-  // Spawn demo windows on mount (mock data for shell demonstration)
-  useEffect(() => {
-    if (hasSpawnedDemo) return;
-    setHasSpawnedDemo(true);
-
-    // Simulate agents spawning windows with staggered timing
-    const timers: NodeJS.Timeout[] = [];
-
-    timers.push(
-      setTimeout(() => {
-        spawnWindow(
-          "Deadline Agent",
-          "2 New Deadlines",
-          <div className="space-y-3">
-            <div className="p-2 rounded-md bg-surface border border-border">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">CAT-1 Exam: BCSE302L</span>
-                <span className="text-[10px] px-1.5 py-0.5 bg-urgent/10 text-urgent rounded">2 days</span>
-              </div>
-              <p className="text-xs text-secondary mt-1">Data Structures — Slot A1</p>
-            </div>
-            <div className="p-2 rounded-md bg-surface border border-border">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Assignment: BECE301L</span>
-                <span className="text-[10px] px-1.5 py-0.5 bg-conflict text-foreground rounded">5 days</span>
-              </div>
-              <p className="text-xs text-secondary mt-1">Digital Logic Design — Upload PDF</p>
-            </div>
-            <p className="text-xs text-secondary italic mt-2">
-              📌 Pin this window to keep deadlines visible
-            </p>
-          </div>,
-          { position: { x: 60, y: 60 }, size: { width: 380, height: 280 } }
-        );
-      }, 800)
-    );
-
-    timers.push(
-      setTimeout(() => {
-        spawnWindow(
-          "Academic Agent",
-          "Attendance Alert",
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 p-2 rounded-md bg-urgent/5 border border-urgent/20">
-              <span className="text-lg">⚠️</span>
-              <div>
-                <p className="text-sm font-medium text-urgent">BECE301L — 73%</p>
-                <p className="text-xs text-secondary">
-                  Below 75% threshold. You need 4 consecutive classes to recover.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-2 rounded-md bg-surface border border-border">
-              <span className="text-lg">✅</span>
-              <div>
-                <p className="text-sm font-medium text-success">BCSE302L — 91%</p>
-                <p className="text-xs text-secondary">Healthy. Can skip 3 more classes safely.</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-2 rounded-md bg-surface border border-border">
-              <span className="text-lg">✅</span>
-              <div>
-                <p className="text-sm font-medium text-success">BCSE303L — 88%</p>
-                <p className="text-xs text-secondary">On track.</p>
-              </div>
-            </div>
-          </div>,
-          { position: { x: 480, y: 80 }, size: { width: 380, height: 310 } }
-        );
-      }, 1500)
-    );
-
-    timers.push(
-      setTimeout(() => {
-        spawnWindow(
-          "Notice Agent",
-          "Campus Notice",
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] px-1.5 py-0.5 bg-accent-light text-accent rounded font-medium">
-                Academic
-              </span>
-              <span className="text-[10px] text-secondary">from VIT Official Group</span>
-            </div>
-            <p className="text-sm text-foreground">
-              Mid-semester examination schedule has been released for Winter 2025-26. 
-              Check VTOP for your individual timetable.
-            </p>
-            <div className="flex gap-2 mt-3">
-              <button className="text-xs px-3 py-1.5 bg-accent text-white rounded-md hover:opacity-90 transition-opacity">
-                View Schedule
-              </button>
-              <button className="text-xs px-3 py-1.5 border border-border text-secondary rounded-md hover:bg-surface transition-colors">
-                Dismiss
-              </button>
-            </div>
-          </div>,
-          { position: { x: 200, y: 350 }, size: { width: 360, height: 230 } }
-        );
-      }, 2400)
-    );
-
-    return () => timers.forEach(clearTimeout);
-  }, [hasSpawnedDemo, spawnWindow]);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
