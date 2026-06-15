@@ -9,7 +9,7 @@ export default function Desktop() {
   const { windows } = useWindowManager();
 
   return (
-    <main className="relative flex-1 overflow-hidden bg-background">
+    <main className="relative flex-1 overflow-hidden bg-transparent">
       {/* Desktop wallpaper / gradient */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-br from-accent/5 via-transparent to-success/5" />
