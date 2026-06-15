@@ -138,8 +138,8 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
             <div
               className={`max-w-[90%] rounded-xl px-3 py-2 ${
                 msg.role === "user"
-                  ? "bg-chat-user text-foreground"
-                  : "bg-chat-ai border border-border text-foreground"
+                  ? "bg-emerald-900 text-emerald-50"
+                  : "bg-slate-800 border border-slate-700 text-slate-100"
               }`}
             >
               <div className="text-[11px] leading-relaxed prose-chat">
@@ -188,11 +188,11 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-chat-ai border border-border rounded-xl px-3 py-2">
+            <div className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2">
               <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -201,7 +201,7 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
       </div>
 
       {/* Input */}
-      <div className="flex items-center gap-1.5 pt-2 border-t border-border">
+      <div className="flex items-center gap-1.5 pt-2 border-t border-slate-800">
         <input
           type="text"
           value={input}
@@ -213,13 +213,13 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
             }
           }}
           placeholder="Ask anything..."
-          className="flex-1 text-xs px-3 py-2 bg-surface border border-border rounded-lg text-foreground placeholder:text-secondary outline-none focus:border-accent"
+          className="flex-1 text-xs px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 outline-none focus:border-emerald-500"
           disabled={loading}
         />
         <button
           onClick={handleSend}
           disabled={!input.trim() || loading}
-          className="px-3 py-2 bg-accent text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-30 shrink-0"
+          className="px-3 py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-500 transition-colors disabled:opacity-30 shrink-0"
         >
           ↑
         </button>

@@ -43,14 +43,14 @@ export default function CommandPalette() {
   return (
     <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-9998 w-full max-w-xl px-4">
       <div
-        className={`flex items-center gap-3 bg-panel-bg/95 backdrop-blur-md border rounded-2xl px-4 py-3 shadow-lg transition-all ${
-          isFocused ? "border-accent ring-2 ring-accent/20 shadow-xl" : "border-border"
+        className={`flex items-center gap-3 bg-slate-950 border rounded-2xl px-4 py-3 shadow-2xl shadow-black/50 transition-all ${
+          isFocused ? "border-emerald-500 ring-2 ring-emerald-500/20" : "border-slate-800"
         }`}
       >
         {/* Command icon */}
-        <span className="text-secondary text-sm shrink-0">
+        <span className="text-slate-400 text-sm shrink-0">
           {processing ? (
-            <span className="inline-block w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+            <span className="inline-block w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           ) : (
             "⌘"
           )}
@@ -69,19 +69,19 @@ export default function CommandPalette() {
             }
           }}
           placeholder="Ask CampusFlow anything... (attendance, deadlines, schedule)"
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-secondary outline-none"
+          className="flex-1 bg-transparent text-sm text-white placeholder:text-slate-500 outline-none"
           disabled={processing}
         />
 
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || processing}
-          className="px-3 py-1.5 bg-accent text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-30 shrink-0"
+          className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-500 transition-colors disabled:opacity-30 shrink-0"
         >
           {processing ? "..." : "Ask"}
         </button>
       </div>
-      <p className="text-center text-[10px] text-secondary mt-1.5">
+      <p className="text-center text-[10px] text-slate-500 mt-1.5">
         Responses appear as floating windows · Press Enter to send
       </p>
     </div>

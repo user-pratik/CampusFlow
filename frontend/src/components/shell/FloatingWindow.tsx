@@ -88,19 +88,19 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
 
   // Determine brand-specific theme classes based on agent name
   const agentLower = win.agentName.toLowerCase();
-  let themeClasses = "";
+  let themeClasses = "border border-slate-800";
   if (agentLower.includes("chat") || agentLower.includes("campusflow")) {
-    themeClasses = "border-t-2 border-t-blue-500 bg-blue-900/10";
+    themeClasses = "border border-slate-800 border-t-2 border-t-emerald-500 shadow-2xl shadow-emerald-900/20";
   } else if (agentLower.includes("whatsapp") || agentLower.includes("message")) {
-    themeClasses = "border-t-2 border-t-green-500 bg-green-900/10";
+    themeClasses = "border border-slate-800 border-t-2 border-t-green-500 shadow-2xl shadow-green-900/20";
   } else if (agentLower.includes("email") || agentLower.includes("mail") || agentLower.includes("gmail")) {
-    themeClasses = "border-t-2 border-t-red-500 bg-red-900/10";
+    themeClasses = "border border-slate-800 border-t-2 border-t-red-500 shadow-2xl shadow-red-900/20";
   } else if (agentLower.includes("schedule") || agentLower.includes("timetable") || agentLower.includes("calendar")) {
-    themeClasses = "border-t-2 border-t-orange-500 bg-orange-900/10";
+    themeClasses = "border border-slate-800 border-t-2 border-t-orange-500 shadow-2xl shadow-orange-900/20";
   } else if (agentLower.includes("attendance") || agentLower.includes("academic")) {
-    themeClasses = "border-t-2 border-t-purple-500 bg-purple-900/10";
+    themeClasses = "border border-slate-800 border-t-2 border-t-purple-500 shadow-2xl shadow-purple-900/20";
   } else if (agentLower.includes("gpa") || agentLower.includes("marks") || agentLower.includes("grade")) {
-    themeClasses = "border-t-2 border-t-yellow-500 bg-yellow-900/10";
+    themeClasses = "border border-slate-800 border-t-2 border-t-yellow-500 shadow-2xl shadow-yellow-900/20";
   }
 
   // CSS-hide minimized windows instead of unmounting (preserves internal state like chat history)
@@ -108,8 +108,8 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
 
   return (
     <div
-      className={`absolute rounded-lg shadow-2xl border border-border bg-panel-bg flex flex-col overflow-hidden transition-shadow ${themeClasses} ${
-        isDragging || isResizing ? "shadow-xl ring-1 ring-accent/30" : ""
+      className={`absolute rounded-lg bg-slate-950 flex flex-col overflow-hidden transition-shadow ${themeClasses} ${
+        isDragging || isResizing ? "ring-1 ring-emerald-500/30" : ""
       } ${isMinimized ? "hidden" : ""}`}
       style={{
         left: win.position.x,
@@ -122,15 +122,15 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
     >
       {/* Title bar */}
       <div
-        className="h-9 bg-surface flex items-center justify-between px-3 shrink-0 cursor-grab active:cursor-grabbing select-none border-b border-border"
+        className="h-9 bg-slate-900 flex items-center justify-between px-3 shrink-0 cursor-grab active:cursor-grabbing select-none border-b border-slate-800"
         onMouseDown={handleMouseDownDrag}
       >
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-sm shrink-0">{win.agentIcon}</span>
-          <span className="text-xs font-medium text-foreground truncate">
+          <span className="text-xs font-medium text-slate-100 truncate">
             {win.title}
           </span>
-          <span className="text-[10px] text-secondary hidden sm:inline">
+          <span className="text-[10px] text-slate-400 hidden sm:inline">
             — {win.agentName}
           </span>
         </div>
@@ -139,7 +139,7 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
           <button
             onClick={(e) => { e.stopPropagation(); togglePin(win.id); }}
             className={`w-5 h-5 flex items-center justify-center rounded text-xs transition-colors ${
-              win.pinned ? "text-accent bg-accent-light" : "text-secondary hover:text-foreground hover:bg-surface-hover"
+              win.pinned ? "text-emerald-400 bg-emerald-950" : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
             }`}
             aria-label={win.pinned ? "Unpin window" : "Pin window"}
             title={win.pinned ? "Unpin" : "Pin"}
@@ -149,7 +149,7 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
           {/* Minimize button */}
           <button
             onClick={(e) => { e.stopPropagation(); minimizeWindow(win.id); }}
-            className="w-5 h-5 flex items-center justify-center rounded text-secondary hover:text-foreground hover:bg-surface-hover transition-colors"
+            className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
             aria-label="Minimize window"
           >
             <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -159,7 +159,7 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
           {/* Close button */}
           <button
             onClick={(e) => { e.stopPropagation(); closeWindow(win.id); }}
-            className="w-5 h-5 flex items-center justify-center rounded text-secondary hover:text-urgent hover:bg-urgent/10 transition-colors"
+            className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-red-400 hover:bg-red-950 transition-colors"
             aria-label="Close window"
           >
             <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -170,7 +170,7 @@ export default function FloatingWindow({ window: win }: FloatingWindowProps) {
       </div>
 
       {/* Content area */}
-      <div className="flex-1 overflow-auto p-3 text-sm text-foreground">
+      <div className="flex-1 overflow-auto p-3 text-sm text-slate-200">
         {win.content}
       </div>
 
