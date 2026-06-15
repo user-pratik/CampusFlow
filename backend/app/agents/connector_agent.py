@@ -161,7 +161,7 @@ class ConnectorAgent(BaseAgent):
 
         emails = self._format_emails(user_message, context.get("emails"))
         calendar = self._format_calendar()
-        timetable = self._format_timetable()
+        timetable = self._format_timetable(context)
         academic_calendar = self._format_academic_calendar()
 
         # Eligibility pre-filter for placement queries
@@ -381,20 +381,35 @@ class ConnectorAgent(BaseAgent):
             )
         return "\n\n".join(lines)
 
-    def _format_timetable(self) -> str:
-        """Format today's timetable."""
-        timetable = self._calendar_data.get("timetable", {})
+    def _format_timetable(self, context: dict | None = None) -> str:
+        """Format today's timetable using real DB data from context.
+        
+        The orchestrator fetches timetable data into context["today_timetable"]
+        (list of dicts with course_code, course_name, start_time, end_time, venue, slot_type).
+        Falls back to full_timetable or empty state — NEVER uses fabricated data.
+        """
         today = datetime.now().strftime("%A")
-        today_schedule = timetable.get(today, [])
+        ctx = context or {}
 
-        if not today_schedule:
-            return f"No classes today ({today})."
+        # Prefer today_timetable from orchestrator context (already filtered by today)
+        today_classes = ctx.get("today_timetable")
 
-        lines = [f"Today ({today}):"]
-        for cls in today_schedule:
+        # If not pre-filtered, try full_timetable and filter by today
+        if not today_classes and ctx.get("full_timetable"):
+            today_classes = ctx["full_timetable"].get(today, [])
+
+        if not today_classes:
+            return f"No classes today ({today}). Timetable may not be synced — use /api/vtop/sync."
+
+        lines = [f"Today ({today}) — {len(today_classes)} classes:"]
+        for cls in today_classes:
+            slot_type_label = "LAB" if cls.get("slot_type", "").lower() == "lab" else "Theory"
+            venue = cls.get("venue", "")
             lines.append(
-                f"  {cls['time']} — {cls['course_title']} ({cls['course_code']}) "
-                f"| {cls['type']} | Room: {cls['room']} | Faculty: {cls['faculty']}"
+                f"  {cls.get('start_time', '?')}–{cls.get('end_time', '?')} — "
+                f"{cls.get('course_name', cls.get('course_code', '?'))} ({cls.get('course_code', '')}) "
+                f"| {slot_type_label}"
+                f"{f' | Room: {venue}' if venue else ''}"
             )
         return "\n".join(lines)
 

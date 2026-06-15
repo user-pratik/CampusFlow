@@ -2,19 +2,19 @@
   "cookies": [
     {
       "name": "JSESSIONID",
-      "value": "CFD093D5F55285D5719C43FE7FFB8299",
+      "value": "4D6B5CA666B367BEC5B6BB0259510BB3",
       "domain": "vtopcc.vit.ac.in",
       "path": "/vtop"
     },
     {
       "name": "SERVERID",
-      "value": "vt1",
+      "value": "vt2",
       "domain": "vtopcc.vit.ac.in",
       "path": "/"
     },
     {
       "name": "cookiesession1",
-      "value": "678A8C3276EDFF9E91C4E654A0C5A27C",
+      "value": "678A8C3254334F6A675C4D22665F7C9E",
       "domain": "vtopcc.vit.ac.in",
       "path": "/"
     }

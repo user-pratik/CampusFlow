@@ -1,0 +1,1494 @@
+<div id="main-section">
+		<!-- Main content -->
+		<section class="content">
+			<div class="col-sm-12">
+				<div class="box box-info">
+
+					<div class="box-header with-border">
+						<h3 class="box-title" >Marks View</h3>
+					</div>
+					<div class="box-body">
+					<form role="form" id="studentMarkView" name="studentMarkView"
+						method="post" autocomplete="off">
+						<input type="hidden" name="authorizedID" id="authorizedID"
+								value="23BAI1126" />
+						<!-- th:object="${examSchedule}"> -->
+						<div class="col-md-12" style="margin-top: 20px; margin-left: 2px;">
+								
+								<div>
+									<div class="col-sm-6 col-sm-offset-3">
+										<div>
+											<label for="acadYear" class="col-sm-4 control-label">Select
+												Semester</label>
+
+											<div class="col-md-8">
+												<select class="form-control" name="semesterSubId"
+													id="semesterSubId"
+													data-validation-engine="validate[required]"
+													onchange="doViewExamMark();">
+													<option value="" selected="selected">-- Choose
+														Semester --</option>
+													<option value="CH20252607">Summer Semester 2025-26</option>
+													<option value="CH20252627">Winter Semester (Industry) 2025-26</option>
+													<option value="CH20252626">Fall Semester (Industry) 2025-26</option>
+													<option value="CH20252618">Winter Semester LLM 2025-26</option>
+													<option value="CH20252605"
+														selected="selected">Winter Semester 2025-26</option>
+													<option value="CH20252614">Fall Semester LLM 2025-26</option>
+													<option value="CH20252601">Fall Semester 2025-26</option>
+													<option value="CH20242509">Summer Semester - II 2024-25</option>
+													<option value="CH20242507">Summer Semester 2024-25</option>
+													<option value="CH20242518">Winter Semester LLM 2024-25</option>
+													<option value="CH20242505">Winter Semester 2024-25</option>
+													<option value="CH20242514">Fall Semester LLM 2024-25</option>
+													<option value="CH20242501">Fall Semester 2024-25</option>
+													<option value="CH20232407">Summer Semester 2023-24</option>
+													<option value="CH20232406">Tri Semester III &amp; VI 2023-24</option>
+													<option value="CH20232418">Winter Semester LLM 2023-24</option>
+													<option value="CH20232405">Winter Semester 2023-24</option>
+													<option value="CH20232403">Tri Semester II &amp; V 2023-24</option>
+													<option value="CH20232414">Fall Semester LLM 2023-24</option>
+													<option value="CH20232417">Fall Semester I year 2023-24</option>
+													<option value="CH20222309">Summer Semester - II 2022-23</option>
+													<option value="CH20232402">Tri Semester I &amp; IV 2023-24</option>
+													<option value="CH20232401">Fall Semester 2023-24</option>
+													<option value="CH20222319">Summer Semester - III 2022-23</option>
+													<option value="CH20222308">Summer Semester - I 2022-23</option>
+													<option value="CH20222325">Fall Inter Semester	 2022-23</option>
+													<option value="CH20222318">Winter Semester LLM 2022-23</option>
+													<option value="CH20222306">Tri Semester III &amp; VI 2022-23</option>
+													<option value="CH20222323">Winter Semester I year 2022-23</option>
+													<option value="CH2022235">Winter Semester 2022-23</option>
+													<option value="CH20222314">Fall Semester LLM 2022-23</option>
+													<option value="CH2022233">Tri Semester II &amp; V 2022-23</option>
+													<option value="CH20222317">Fall Semester I year 2022-23</option>
+													<option value="CH2022232">Tri Semester I &amp; IV 2022-23</option>
+													<option value="CH2022231">Fall Semester 2022-23</option>
+													<option value="CH20222312">Fall Semester LAW 2022-23</option>
+													<option value="CH2021229">Summer Semester - II 2021-22</option>
+													<option value="CH20212219">Summer Semester - III 2021-22</option>
+													<option value="CH2021228">Summer Semester - I 2021-22</option>
+													<option value="CH20212218">Winter Semester LLM 2021-22</option>
+													<option value="CH20212223">Winter Semester I year 2021-22</option>
+													<option value="CH20212224">Winter Semester LAW I year 2021-22</option>
+													<option value="CH2021216">Tri Semester III &amp; VI 2021-22</option>
+													<option value="CH2021225">Winter Semester 2021-22</option>
+													<option value="CH20212216">Win Semester LAW 2021-22</option>
+													<option value="CH20212222">Fall Intra Semester 2021-22</option>
+													<option value="CH2021223">Tri Semester II &amp; V 2021-22</option>
+													<option value="CH20212214">Fall Semester LLM 2021-22</option>
+													<option value="CH20212221">Fall Semester I LAW 2021-22</option>
+													<option value="CH20212217">Fall Semester I YEAR 2021-22</option>
+													<option value="CH20212212">Fall Semester LAW 2021-22</option>
+													<option value="CH2021221">Fall Semester 2021-22</option>
+													<option value="CH2021222">Tri Semester I &amp; IV 2021-22</option>
+													<option value="CH2020217">Summer Semester - II 2020-21</option>
+													<option value="CH2020218">Summer Semester - I 2020-21</option>
+													<option value="CH20202119">Summer Semester - III 2020-21</option>
+													<option value="CH20202118">Winter Semester LLM 2020-21</option>
+													<option value="CH20202117">Win Semester I YEAR 2020-21</option>
+													<option value="CH2020215">Winter Semester 2020-21</option>
+													<option value="CH20202116">Win Semester LAW 2020-21</option>
+													<option value="CH20202115">INTERSEM 2020-21</option>
+													<option value="CH2020213">Tri Semester II &amp; V 2020-21</option>
+													<option value="CH20202114">Fall Semester LLM 2020-21</option>
+													<option value="CH20202113">ARREAR II 2020-21</option>
+													<option value="CH2020212">Tri Semester I &amp; IV 2020-21</option>
+													<option value="CH2020211">Fall Semester 2020-21</option>
+													<option value="CH20202112">FALL SEM LAW 2020-21</option>
+													<option value="CH2019204">Arrear Semester 2019-20</option>
+													<option value="CH2019208">Summer Semester - I 2019-20</option>
+													<option value="CH2020219">Summer Semester - II 2019-20</option>
+													<option value="CH2019207">Summer Semester 2019-20</option>
+													<option value="CH2019206">Tri Semester III &amp; VI 2019-20</option>
+													<option value="CH2019205">Winter Semester 2019-20</option>
+													<option value="CH2019203">Tri Semester II &amp; V 2019-20</option>
+													<option value="CH2019201">Fall Semester 2019-20</option>
+													<option value="CH2018195">Winter Semester 2018-19</option>
+													<option value="CH2018191">Fall Semester 2018-19</option>
+													<option value="CH2017185">Winter Semester 2017-18</option>
+													<option value="CH2017181">Fall Semester 2017-18</option>
+													<option value="CH2016175">Winter Semester 2016-17</option>
+													<option value="CH2016171">Fall Semester 2016-17</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="form-group col-sm-12"></div>
+									<span class="col-sm-12 col-md-12"
+										style="font-size: 20px; color: green; text-align: center;"></span> <span
+										class="col-sm-12 col-md-12"
+										style="font-size: 20px; color: red; text-align: center;"></span>
+									<div id="fixedTableContainer" class="fixedTableContainer" >
+										<table class="customTable" style="align: center;">
+
+											<tr class="tableHeader">
+												<td>Sl.No.</td>
+												<td>ClassNbr</td>
+												<td>Course Code</td>
+												<td>Course Title</td>
+												<td>Course Type</td>
+												<td>Course System</td>
+												<td>Faculty</td>
+												<td>Slot</td>
+												<td>Course Mode</td>
+											</tr>
+											
+												<tr class="tableContent" >
+													<td>1</td>
+													<td>CH2025260502271</td>
+													<td>BCSE332P</td>
+													<td>Deep Learning Lab</td>
+													<td>Lab Only</td>
+													<td>CBCS</td>
+													<td>THOMAS ABRAHAM J V</td>
+													<td>L21+L22</td>
+													<td>LBC</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assessment - 1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>7.0</output></td>
+																<td><output>7</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assessment - 2</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>8.0</output></td>
+																<td><output>8</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assessment - 3</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Assessment - 4</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Assessment - 5</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Assessment - 6</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>7</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>50</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>44.0</output></td>
+																<td><output>35.2</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>2</td>
+													<td>CH2025260502262</td>
+													<td>BCSE332L</td>
+													<td>Deep Learning</td>
+													<td>Theory Only</td>
+													<td>CBCS</td>
+													<td>THOMAS ABRAHAM J V</td>
+													<td>D2+TD2</td>
+													<td>CBL09</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Review - I</output></td>
+																<td><output>5</output></td>
+																<td><output>5</output></td>
+																<td><output>Present</output></td>
+																<td><output>5.0</output></td>
+																<td><output>5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Review - II</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>8.0</output></td>
+																<td><output>8</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Review - III</output></td>
+																<td><output>15</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>13.0</output></td>
+																<td><output>13</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>29.0</output></td>
+																<td><output>8.7</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>25.0</output></td>
+																<td><output>7.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>73.0</output></td>
+																<td><output>29.2</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>3</td>
+													<td>CH2025260500038</td>
+													<td>BSTS302P</td>
+													<td>Advanced Competitive Coding - II</td>
+													<td>Soft Skill</td>
+													<td>CBCS</td>
+													<td>FACE (APT)</td>
+													<td>B2+TB2</td>
+													<td>SBC01</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assessment - 1</output></td>
+																<td><output>15</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>15.0</output></td>
+																<td><output>15</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assessment - 2</output></td>
+																<td><output>15</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>15.0</output></td>
+																<td><output>15</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>30</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>30.0</output></td>
+																<td><output>15</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>CAT1-Examly MARKS UPLOAD</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>30</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>26.0</output></td>
+																<td><output>13</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>CAT2-Examly Mark</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>50</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>38.0</output></td>
+																<td><output>30.4</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>FAT-Examly Mark</output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>4</td>
+													<td>CH2025260501804</td>
+													<td>BCSE309P</td>
+													<td>Cryptography and Network Security Lab</td>
+													<td>Lab Only</td>
+													<td>CBCS</td>
+													<td>JANNATH NISHA O S</td>
+													<td>L3+L4</td>
+													<td>LBC</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assessment - 1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assessment - 2</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assessment - 3</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Assessment - 4</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.33</output></td>
+																<td><output>9.33</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>MAT</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Assessment - 6</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>7</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>50</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>39.0</output></td>
+																<td><output>31.2</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>5</td>
+													<td>CH2025260501798</td>
+													<td>BCSE309L</td>
+													<td>Cryptography and Network Security</td>
+													<td>Theory Only</td>
+													<td>CBCS</td>
+													<td>JANNATH NISHA O S</td>
+													<td>C2+TC2</td>
+													<td>CBL09</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>DA1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>DA2</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>40.0</output></td>
+																<td><output>12</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>40.0</output></td>
+																<td><output>12</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>DA3</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>74.0</output></td>
+																<td><output>29.6</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>6</td>
+													<td>CH2025260502284</td>
+													<td>BCSE418L</td>
+													<td>Explainable Artificial Intelligence</td>
+													<td>Theory Only</td>
+													<td>CBCS</td>
+													<td>SUGUNA</td>
+													<td>G2</td>
+													<td>CBL09</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Project-Review-1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>Nil</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Project Review-II</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>Nil</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Project Review-III</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>Nil</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>37.0</output></td>
+																<td><output>11.1</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>Nil</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>35.0</output></td>
+																<td><output>10.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>Nil</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>78.0</output></td>
+																<td><output>31.2</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>7</td>
+													<td>CH2025260502228</td>
+													<td>BCSE307P</td>
+													<td>Compiler Design Lab</td>
+													<td>Lab Only</td>
+													<td>CBCS</td>
+													<td>SIVAKUMAR</td>
+													<td>L41+L42</td>
+													<td>LBC</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assessment - 1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.25</output></td>
+																<td><output>9.25</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assessment - 2</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.5</output></td>
+																<td><output>9.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assessment - 3</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.25</output></td>
+																<td><output>9.25</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Assessment - 4</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.5</output></td>
+																<td><output>9.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Assessment - 5</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Assessment - 6</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>7</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>50</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>46.0</output></td>
+																<td><output>36.8</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>8</td>
+													<td>CH2025260502216</td>
+													<td>BCSE307L</td>
+													<td>Compiler Design</td>
+													<td>Theory Only</td>
+													<td>CBCS</td>
+													<td>SIVAKUMAR</td>
+													<td>F2+TF2</td>
+													<td>CBL09</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assignment - I</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assignment - II</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>42.0</output></td>
+																<td><output>12.6</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>35.0</output></td>
+																<td><output>10.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output>Updated</output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Quiz - I</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>73.0</output></td>
+																<td><output>29.2</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>9</td>
+													<td>CH2025260500511</td>
+													<td>BHUM106L</td>
+													<td>PRINCIPLES OF SOCIOLOGY</td>
+													<td>Theory Only</td>
+													<td>CBCS</td>
+													<td>SWATI </td>
+													<td>E2+TE2</td>
+													<td>CBL09</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assignment - I</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.5</output></td>
+																<td><output>9.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assignment - II</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.5</output></td>
+																<td><output>9.5</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assignment - III</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>39.0</output></td>
+																<td><output>11.7</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>37.0</output></td>
+																<td><output>11.1</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>77.5</output></td>
+																<td><output>31</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>10</td>
+													<td>CH2025260503464</td>
+													<td>BSSC102N</td>
+													<td>Indian Constitution</td>
+													<td>Online Course</td>
+													<td>CBCS</td>
+													<td>SHELSHEYA S L</td>
+													<td>NIL</td>
+													<td>OCC02</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assessment - 1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>7.0</output></td>
+																<td><output>7</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assessment - 2</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assessment - 3</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Assessment - 4</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Assessment - 5</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Assessment - 6</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>7</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>70.0</output></td>
+																<td><output>28</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>11</td>
+													<td>CH2025260503052</td>
+													<td>BCSE419P</td>
+													<td>Speech and Language Processing lab</td>
+													<td>Lab Only</td>
+													<td>CBCS</td>
+													<td>SREEJA P S</td>
+													<td>L9+L10</td>
+													<td>LBC</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assessment - 1</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assessment - 2</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assessment - 3</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Assessment - 4</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Assessment - 5</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.88</output></td>
+																<td><output>9.88</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Assessment - 6</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>6.0</output></td>
+																<td><output>6</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>7</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>50</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>43.0</output></td>
+																<td><output>34.4</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+												<tr class="tableContent" >
+													<td>12</td>
+													<td>CH2025260503051</td>
+													<td>BCSE419L</td>
+													<td>Speech and Language Processing</td>
+													<td>Theory Only</td>
+													<td>CBCS</td>
+													<td>SREEJA P S</td>
+													<td>A2+TA2</td>
+													<td>CBL09</td>
+												</tr>
+												<tr class="tableContent">
+													<td colspan="9" align="center">
+														<table class="customTable-level1" style="align: center;width: 80%;" >
+															<tr class="tableHeader-level1">
+																<td>Sl.No.</td>
+																<td>Mark Title</td>
+																<td>Max. Mark</td>
+																<td>Weightage %</td>
+																<td>Status</td>
+																<td>Scored Mark</td>
+																<td>Weightage Mark</td>
+																<td>Class Average</td>
+																<td>Mark Posted Strength</td>
+																<td>Remark</td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>1</output></td>
+																<td><output>Assignment - I</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>9.0</output></td>
+																<td><output>9</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>2</output></td>
+																<td><output>Assignment - II</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>3</output></td>
+																<td><output>Assignment - III</output></td>
+																<td><output>10</output></td>
+																<td><output>10</output></td>
+																<td><output>Present</output></td>
+																<td><output>10.0</output></td>
+																<td><output>10</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>4</output></td>
+																<td><output>Continuous Assessment Test - I</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>37.0</output></td>
+																<td><output>11.1</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>5</output></td>
+																<td><output>Continuous Assessment Test - II</output></td>
+																<td><output>50</output></td>
+																<td><output>15</output></td>
+																<td><output>Present</output></td>
+																<td><output>34.0</output></td>
+																<td><output>10.2</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+															<tr class="tableContent-level1">
+																<td><output>6</output></td>
+																<td><output>Final Assessment Test</output></td>
+																<td><output>100</output></td>
+																<td><output>40</output></td>
+																<td><output>Present</output></td>
+																<td><output>72.0</output></td>
+																<td><output>28.8</output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+																<td><output></output></td>
+															</tr>
+														</table>
+
+
+													</td>
+												</tr>
+											
+
+
+										</table>
+
+									</div>
+								</div>
+						</div>
+
+					</form>
+
+				<noscript>
+					<h2 class="text-red">Enable JavaScript to Access VTOP</h2>
+				</noscript>
+				<!-- Custom Scripts for VTOP Pages-->
+
+				<script>
+					/*<![CDATA[*/
+
+					jQuery(document).ready(function() {
+						// binds form submission and fields to the validation engine								
+						jQuery("#studentMarkView").validationEngine('attach', {
+							autoHidePrompt : true,
+							binded : false,
+							onValidationComplete : function(form, status) {
+								if (status) {
+									doSavestudentMarkView();
+								}
+							}
+						});
+					});
+
+					function doViewExamMark() {
+						var myform = document.getElementById("studentMarkView");
+						var fd = new FormData(myform);
+						var csrfName = "_csrf";
+		                var csrfValue = "28edcf3a-44f3-403b-822e-2863bdac7c0a";
+		                fd.append(csrfName,csrfValue);
+						$
+								.blockUI({
+									message : '<img src="assets/img/482.GIF"> loading... Just a moment...'
+								});
+						$.ajax({
+							url : "examinations/doStudentMarkView",
+							type : "POST",
+							data : fd,
+							cache : false,
+							processData : false,
+							contentType : false,
+							success : function(response) {
+								$.unblockUI();
+								$("#main-section").html(response);
+
+							}
+
+						});
+					}
+					/*]]>*/
+				</script>
+		
+	<!-- /.content-wrapper 
+		<footer class="main-footer" th:include="layouts/footer::footer"></footer>-->
+</div></div></div></section></div>

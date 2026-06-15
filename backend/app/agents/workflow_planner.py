@@ -188,6 +188,16 @@ async def plan_workflow(message: str, history: list[dict]) -> WorkflowPlan:
             plan.action = "chat_only"
             plan.data_request = {"source": "whatsapp_email", "filters": {}}
 
+        # Hard override: Calendar/action keywords ALWAYS go to action agent
+        # Splits into creation verb + calendar word — both must match
+        creation_verbs = ["add", "create", "set", "schedule", "put", "book", "remind"]
+        has_creation_verb = any(v in lower_msg for v in creation_verbs)
+        has_calendar_word = any(k in lower_msg for k in ["calendar", "reminder", "remind me", "alarm", "event"])
+        if plan.agent != "action" and has_creation_verb and has_calendar_word:
+            logger.info("OVERRIDE: forcing action agent — creation verb + calendar keyword detected")
+            plan.agent = "action"
+            plan.action = "chat_only"
+
         logger.info(
             "Workflow plan: agent=%s, action=%s, source=%s, filters=%s, confidence=%.2f | %s",
             plan.agent, plan.action, plan.source,
@@ -407,24 +417,21 @@ async def retrieve_scoped_data(plan: WorkflowPlan) -> dict:
                 for p in rows
             ]
 
-        elif source == "timetable":
-            day_name = filters.get("day") or datetime.now().strftime("%A")
-            query = select(TimetableSlot).where(
-                TimetableSlot.day_of_week == day_name
-            ).order_by(TimetableSlot.start_time)
-            result = await session.exec(query)
+        elif source in ("timetable", "timetable_slots"):
+            # Fetch all slots and resolve via VIT_SLOT_MAP to get day/time grouping
+            result = await session.exec(select(TimetableSlot))
             rows = result.all()
-            data["timetable"] = [
-                {
-                    "course_code": s.course_code,
-                    "course_name": s.course_name,
-                    "start_time": s.start_time,
-                    "end_time": s.end_time,
-                    "venue": s.venue,
-                    "slot_type": s.slot_type,
-                }
-                for s in rows
-            ]
+            if rows:
+                from app.routers.academic import _resolve_slots_to_schedule
+                full_schedule = _resolve_slots_to_schedule(rows)
+                day_name = filters.get("day") or datetime.now().strftime("%A")
+                today_classes = full_schedule.get(day_name, [])
+                data["timetable"] = today_classes
+                data["today_timetable"] = today_classes
+                data["full_timetable"] = full_schedule
+                data["today_day"] = day_name
+            else:
+                data["timetable"] = []
 
         elif source == "regulations":
             from pathlib import Path
@@ -640,7 +647,7 @@ async def retrieve_with_condition_resolution(plan: WorkflowPlan) -> dict:
 
     # Skip condition detection for sources unlikely to have conditional language
     # (timetable is purely factual, attendance is data, chat has no data)
-    skip_detection_sources = {"timetable", "attendance", "course_marks", "placements", "deadlines", "null", ""}
+    skip_detection_sources = {"timetable", "timetable_slots", "attendance", "course_marks", "placements", "deadlines", "null", ""}
     if plan.source in skip_detection_sources or not plan.source:
         return data
 

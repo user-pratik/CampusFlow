@@ -275,9 +275,36 @@ class SyncOrchestrator:
     async def _scrape_marks(self, semester_id: str) -> list[dict] | None:
         """Scrape marks data for a semester.
 
+        VTOP marks uses doStudentMarkView twice:
+        1. First POST establishes the marks page context
+        2. Second POST with semesterSubId returns actual marks HTML fragment
+
         Returns:
             List of marks records, or None if session expired.
         """
+        import time
+
+        # First call - load the marks page (establishes session context)
+        r1 = await self.client.post(
+            f"{VTOP_BASE_URL}/examinations/doStudentMarkView",
+            data={
+                "authorizedID": self._authorized_id,
+                "_csrf": self._csrf,
+                "verifyMenu": "true",
+                "nocache": f"@{int(time.time() * 1000)}",
+            },
+        )
+
+        if self._is_login_redirect(r1):
+            logger.warning("Session expired during marks page load.")
+            await self.session_store.mark_expired()
+            return None
+
+        # Update CSRF from the page
+        soup1 = BeautifulSoup(r1.text, "lxml")
+        self._update_csrf(soup1)
+
+        # Second call - submit with semesterSubId to get marks data
         resp = await self.client.post(
             f"{VTOP_BASE_URL}/examinations/doStudentMarkView",
             data={
@@ -296,7 +323,7 @@ class SyncOrchestrator:
         from pathlib import Path
         debug_path = Path(__file__).resolve().parent.parent.parent.parent / "debug_marks.html"
         debug_path.write_text(resp.text[:30000], encoding="utf-8")
-        logger.info("Marks response: %d chars", len(resp.text))
+        logger.info("Marks response (2nd call): %d chars", len(resp.text))
 
         soup = BeautifulSoup(resp.text, "lxml")
         self._update_csrf(soup)

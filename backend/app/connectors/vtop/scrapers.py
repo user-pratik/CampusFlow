@@ -90,44 +90,126 @@ def parse_attendance(soup: BeautifulSoup) -> list[dict]:
 
 
 def parse_marks(soup: BeautifulSoup) -> list[dict]:
-    """Parse the internal marks page into structured records.
+    """Parse the VTOP marks page with nested per-course tables.
+
+    VTOP structure:
+    - Main table: Sl.No | ClassNbr | Course Code | Course Title | Course Type | ...
+    - Each course row is followed by an inner table: Sl.No | Mark Title | Max. Mark | Weightage % | Status | Scored Mark
 
     Returns:
-        List of dicts with: course_code, course_title, cat1, cat2, assignment, total
+        List of dicts with: course_code, course_title, mark_title, max_mark, weightage_pct, score, status
     """
     records = []
-    table = soup.find("table", {"id": re.compile(r"mark", re.I)})
-    if not table:
-        tables = soup.find_all("table")
-        for t in tables:
-            headers = [th.get_text(strip=True).lower() for th in t.find_all("th")]
-            if "cat" in " ".join(headers) or "mark" in " ".join(headers):
-                table = t
-                break
 
-    if not table:
+    # Find all tables in the page
+    tables = soup.find_all("table")
+    if not tables:
         logger.warning("Marks table not found in page.")
         return records
 
-    rows = table.find_all("tr")[1:]
-    for row in rows:
-        cols = [td.get_text(strip=True) for td in row.find_all("td")]
-        if len(cols) >= 5:
-            try:
-                records.append({
-                    "course_code": cols[1],
-                    "course_title": cols[2],
-                    "cat1": _parse_float(cols[3]),
-                    "cat2": _parse_float(cols[4]) if len(cols) > 4 else None,
-                    "assignment": _parse_float(cols[5]) if len(cols) > 5 else None,
-                    "total": _parse_float(cols[-1]),
-                })
-            except (ValueError, IndexError) as e:
-                logger.debug("Skipping marks row: %s", e)
-                continue
+    # The main course table has headers: Sl.No, ClassNbr, Course Code, Course Title...
+    main_table = None
+    for t in tables:
+        first_row = t.find("tr")
+        if first_row:
+            cells = [td.get_text(strip=True).lower() for td in first_row.find_all("td")]
+            if "course code" in " ".join(cells) or "course title" in " ".join(cells):
+                main_table = t
+                break
+
+    if not main_table:
+        # Fallback: look for mark-specific tables directly
+        for t in tables:
+            first_row = t.find("tr")
+            if first_row:
+                cells = [td.get_text(strip=True).lower() for td in first_row.find_all("td")]
+                if "mark title" in " ".join(cells) or "scored mark" in " ".join(cells):
+                    # This is an inner marks table without course context
+                    _parse_inner_marks_table(t, "", "", records)
+
+        if records:
+            logger.info("Parsed %d marks records (from inner tables only).", len(records))
+        else:
+            logger.warning("Marks table not found in page.")
+        return records
+
+    # Parse the main table structure
+    rows = main_table.find_all("tr")
+    current_course_code = ""
+    current_course_title = ""
+
+    for row in rows[1:]:  # Skip header
+        cells = row.find_all("td")
+        if not cells:
+            continue
+
+        cell_texts = [td.get_text(strip=True) for td in cells]
+
+        # Check if this is a course header row (has course code in column 2-3)
+        if len(cell_texts) >= 4:
+            potential_code = cell_texts[2] if len(cell_texts) > 2 else ""
+            potential_title = cell_texts[3] if len(cell_texts) > 3 else ""
+
+            # Course codes match pattern like BCSE203E, BMAT202L, etc.
+            if re.match(r"^[A-Z]{2,5}\d{3,4}", potential_code):
+                current_course_code = potential_code
+                current_course_title = potential_title
+
+        # Check if this row contains a nested marks table
+        inner_table = row.find("table")
+        if inner_table and current_course_code:
+            _parse_inner_marks_table(inner_table, current_course_code, current_course_title, records)
 
     logger.info("Parsed %d marks records.", len(records))
     return records
+
+
+def _parse_inner_marks_table(table, course_code: str, course_title: str, records: list):
+    """Parse an inner marks table for a single course.
+
+    Columns: Sl.No | Mark Title | Max. Mark | Weightage % | Status | Scored Mark | Weightage Mark
+    """
+    rows = table.find_all("tr")
+    if len(rows) < 2:
+        return
+
+    # Detect column indices from header
+    header_cells = [td.get_text(strip=True).lower() for td in rows[0].find_all("td")]
+    title_idx = max_idx = weight_pct_idx = status_idx = score_idx = weight_mark_idx = -1
+
+    for i, h in enumerate(header_cells):
+        if "title" in h:
+            title_idx = i
+        elif "max" in h and "mark" in h:
+            max_idx = i
+        elif "weightage" in h and "%" in h:
+            weight_pct_idx = i
+        elif "status" in h:
+            status_idx = i
+        elif "scored" in h:
+            score_idx = i
+        elif "weightage" in h and "mark" in h.replace("%", ""):
+            weight_mark_idx = i
+
+    for row in rows[1:]:
+        cells = [td.get_text(strip=True) for td in row.find_all("td")]
+        if len(cells) < 3:
+            continue
+
+        mark_title = cells[title_idx] if title_idx >= 0 and title_idx < len(cells) else ""
+        if not mark_title or mark_title.isdigit():
+            continue  # Skip empty or serial number rows
+
+        records.append({
+            "course_code": course_code,
+            "course_title": course_title,
+            "mark_title": mark_title,
+            "max_mark": _parse_float(cells[max_idx]) if max_idx >= 0 and max_idx < len(cells) else None,
+            "weightage_pct": _parse_float(cells[weight_pct_idx]) if weight_pct_idx >= 0 and weight_pct_idx < len(cells) else None,
+            "score": _parse_float(cells[score_idx]) if score_idx >= 0 and score_idx < len(cells) else None,
+            "weightage_mark": _parse_float(cells[weight_mark_idx]) if weight_mark_idx >= 0 and weight_mark_idx < len(cells) else None,
+            "status": cells[status_idx] if status_idx >= 0 and status_idx < len(cells) else None,
+        })
 
 
 def parse_academic_history(soup: BeautifulSoup) -> dict:

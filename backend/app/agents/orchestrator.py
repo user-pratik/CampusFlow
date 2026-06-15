@@ -178,6 +178,11 @@ class OrchestratorAgent(BaseAgent):
             result = await self.connector_agent.execute(agent_payload)
             intent = "connector"
         elif plan.agent == "timetable":
+            # Ensure timetable context is in the right keys for connector agent
+            if "today_timetable" not in agent_payload["context"] and "timetable" in prefetched_data:
+                agent_payload["context"]["today_timetable"] = prefetched_data.get("today_timetable", prefetched_data.get("timetable", []))
+                agent_payload["context"]["full_timetable"] = prefetched_data.get("full_timetable", {})
+                agent_payload["context"]["today_day"] = prefetched_data.get("today_day", datetime.now().strftime("%A"))
             result = await self.connector_agent.execute(agent_payload)
             intent = "connector"
         elif plan.agent in ("schedule",):
@@ -190,7 +195,7 @@ class OrchestratorAgent(BaseAgent):
             # WhatsApp/email queries — fetch context and pass to connector agent
             from app.database import async_session_maker
             from sqlmodel import select
-            from app.models import EmailNotification
+            from app.models import EmailNotification, TimetableSlot
             async with async_session_maker() as session:
                 wa_result = await session.exec(
                     select(EmailNotification)
@@ -206,6 +211,10 @@ class OrchestratorAgent(BaseAgent):
                     .limit(30)
                 )
                 email_messages = email_result.all()
+
+                # Also fetch timetable for schedule context
+                tt_result = await session.exec(select(TimetableSlot))
+                tt_slots = tt_result.all()
 
             agent_payload["context"]["whatsapp_messages"] = [
                 {
@@ -229,6 +238,16 @@ class OrchestratorAgent(BaseAgent):
                 }
                 for e in email_messages
             ]
+
+            # Resolve timetable slots to day/time schedule
+            if tt_slots:
+                from app.routers.academic import _resolve_slots_to_schedule
+                full_schedule = _resolve_slots_to_schedule(tt_slots)
+                today_name = datetime.now().strftime("%A")
+                agent_payload["context"]["today_timetable"] = full_schedule.get(today_name, [])
+                agent_payload["context"]["full_timetable"] = full_schedule
+                agent_payload["context"]["today_day"] = today_name
+
             print(f"🔥 CONNECTOR: whatsapp={len(wa_messages)}, emails={len(email_messages)}", flush=True)
             result = await self.connector_agent.execute(agent_payload)
             intent = "connector"
@@ -499,7 +518,7 @@ Be concise (under 150 words), helpful, and precise."""
         """Gather all required context data from DB and memory."""
         from app.database import async_session_maker
         from sqlmodel import select
-        from app.models import Attendance, CourseMark, AcademicProfile, Task, Event, Notice, EmailNotification
+        from app.models import Attendance, CourseMark, AcademicProfile, Task, Event, Notice, EmailNotification, TimetableSlot
 
         context: dict = {}
 
@@ -583,6 +602,20 @@ Be concise (under 150 words), helpful, and precise."""
                     }
 
             if "emails" in requires:
+                # Also always fetch today's timetable for context
+                from app.routers.academic import _resolve_slots_to_schedule
+                tt_result = await session.exec(select(TimetableSlot))
+                tt_slots = tt_result.all()
+                if tt_slots:
+                    from datetime import datetime as _dt
+                    today_name = _dt.now().strftime("%A")
+                    schedule = _resolve_slots_to_schedule(tt_slots)
+                    today_classes = schedule.get(today_name, [])
+                    context["today_timetable"] = today_classes
+                    context["today_day"] = today_name
+                    context["full_timetable"] = schedule
+                    logger.info("Timetable context: %s has %d classes", today_name, len(today_classes))
+
                 result = await session.exec(
                     select(EmailNotification)
                     .order_by(EmailNotification.received_at.desc())
