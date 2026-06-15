@@ -142,22 +142,26 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
                   : "bg-slate-800 border border-slate-700 text-slate-100"
               }`}
             >
-              <div className="text-[11px] leading-relaxed prose-chat">
+              <div className="text-[11px] leading-relaxed whitespace-pre-wrap prose-chat">
                 <ReactMarkdown
                   components={{
-                    p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
-                    strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                    p: ({ children }) => <p className="mb-2 leading-relaxed last:mb-0">{children}</p>,
+                    strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
                     em: ({ children }) => <em className="italic">{children}</em>,
                     ul: ({ children }) => <ul className="list-disc list-inside mb-1.5 space-y-0.5">{children}</ul>,
                     ol: ({ children }) => <ol className="list-decimal list-inside mb-1.5 space-y-0.5">{children}</ol>,
                     li: ({ children }) => <li className="ml-1">{children}</li>,
-                    code: ({ children }) => <code className="bg-white/10 px-1 py-0.5 rounded text-[10px] font-mono">{children}</code>,
-                    pre: ({ children }) => <pre className="bg-white/5 border border-white/10 rounded-md p-2 overflow-x-auto text-[10px] my-1.5">{children}</pre>,
+                    code: ({ children }) => <code className="bg-slate-700 px-1 py-0.5 rounded text-[10px] font-mono">{children}</code>,
+                    pre: ({ children }) => <pre className="bg-slate-900 border border-slate-700 rounded-md p-2 overflow-x-auto text-[10px] my-1.5">{children}</pre>,
                     h1: ({ children }) => <h1 className="text-sm font-bold mb-1">{children}</h1>,
                     h2: ({ children }) => <h2 className="text-xs font-bold mb-1">{children}</h2>,
                     h3: ({ children }) => <h3 className="text-xs font-semibold mb-0.5">{children}</h3>,
-                    a: ({ children, href }) => <a href={href} className="text-accent underline" target="_blank" rel="noopener noreferrer">{children}</a>,
-                    blockquote: ({ children }) => <blockquote className="border-l-2 border-accent/50 pl-2 italic opacity-80 my-1">{children}</blockquote>,
+                    a: ({ children, href }) => <a href={href} className="text-emerald-400 underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                    blockquote: ({ children }) => <blockquote className="border-l-2 border-emerald-500/50 pl-2 italic opacity-80 my-1">{children}</blockquote>,
+                    table: ({ children }) => <div className="overflow-x-auto my-2"><table className="w-full text-left border-collapse">{children}</table></div>,
+                    thead: ({ children }) => <thead className="border-b border-slate-600 bg-slate-800/50">{children}</thead>,
+                    th: ({ children }) => <th className="p-2 font-semibold">{children}</th>,
+                    td: ({ children }) => <td className="p-2 border-b border-slate-700/50">{children}</td>,
                   }}
                 >
                   {msg.content}

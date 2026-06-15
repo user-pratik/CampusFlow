@@ -42,7 +42,7 @@ DISAMBIGUATION RULES (follow strictly):
 4. "deadline"/"due"/"submission" WITHOUT company context -> "connector"
 5. "schedule"/"class"/"today"/"tomorrow" about VIEWING existing timetable -> "connector"
 6. "schedule"/"plan" about CREATING a new study plan -> "schedule"
-7. Vague queries like "how am I doing", "what's happening" -> ALWAYS "general"
+7. Vague queries like "how am I doing", "what's happening" -> ALWAYS "academic" with requires_context: ["marks", "attendance", "profile"] (provides a holistic academic overview)
 8. If BOTH attendance AND grade/CGPA are mentioned, pick the DOMINANT subject (the one the user wants answered)
 9. If genuinely ambiguous between 2+ intents, choose "general"
 
@@ -451,6 +451,7 @@ The user is asking a follow-up question about this data or related policy.
 - For POLICY/REGULATION questions: answer from the regulations data, citing specific rules.
 - Do NOT fabricate rules or exemptions that aren't in the regulations data.
 - If the regulations data doesn't cover something, say you don't have that information.
+- Use the JSON data above as ground truth. Perform exact arithmetic from these numbers. Do not estimate.
 Be concise (under 150 words), helpful, and precise."""
 
         history_text = ""
@@ -706,6 +707,15 @@ CRITICAL RULES:
 
 CONVERSATION HISTORY:
 {history_text}"""
+
+        # Inject context data if available (so the LLM isn't blind)
+        context = payload.get("context", {})
+        marks = context.get("marks", [])
+        attendance = context.get("attendance", [])
+        if marks or attendance:
+            marks_summary = "\n".join([f"- {m['course_code']}: {m['mark_title']} = {m.get('score','N/A')}" for m in marks[:20]])
+            attendance_summary = "\n".join([f"- {a['course_code']}: {a['percentage']}%" for a in attendance[:15]])
+            system_prompt += f"\n\nSTUDENT DATA:\nMarks:\n{marks_summary}\n\nAttendance:\n{attendance_summary}"
 
         try:
             response = await chat_completion(
