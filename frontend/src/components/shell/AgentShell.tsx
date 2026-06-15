@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { WindowManagerProvider, useWindowManager } from "@/lib/windowManager";
 import TopBar from "./TopBar";
 import Desktop from "./Desktop";
+import AppGrid from "./AppGrid";
 import { useTimetableAgent } from "./TimetableAgentWindow";
 import { useAttendanceRiskAgent } from "./AttendanceRiskAgentWindow";
 import { useNotificationCenter } from "./NotificationCenter";
@@ -210,6 +211,7 @@ function AgentShellInner() {
   const { spawnWindow } = useWindowManager();
   const [hasSpawnedDemo, setHasSpawnedDemo] = useState(false);
   const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "done" | "error">("idle");
+  const [isAppGridOpen, setIsAppGridOpen] = useState(false);
   const { autoSpawn: autoSpawnTimetable } = useTimetableAgent();
   const { checkAndSpawn: checkAttendanceRisk } = useAttendanceRiskAgent();
   const { unreadCount, openNotificationCenter } = useNotificationCenter();
@@ -377,7 +379,12 @@ function AgentShellInner() {
         onLaunchWhatsApp={spawnWhatsApp}
         onLaunchMarks={spawnGPA}
       />
-      <Desktop />
+      <Desktop onToggleAppGrid={() => setIsAppGridOpen((v) => !v)} />
+      <AppGrid
+        isOpen={isAppGridOpen}
+        onClose={() => setIsAppGridOpen(false)}
+        onSyncClick={handleSyncClick}
+      />
     </div>
   );
 }

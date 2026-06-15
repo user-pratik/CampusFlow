@@ -72,37 +72,6 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   const [activeWindowId, setActiveWindowId] = useState<WindowId | null>(null);
   const zIndexCounter = useRef(100);
 
-  const spawnWindow = useCallback(
-    (
-      agentName: string,
-      title: string,
-      content: React.ReactNode,
-      options?: Partial<Pick<AgentWindow, "agentIcon" | "size" | "position" | "pinned">>
-    ): WindowId => {
-      const id = `win-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      zIndexCounter.current += 1;
-
-      const newWindow: AgentWindow = {
-        id,
-        agentName,
-        agentIcon: options?.agentIcon || AGENT_ICONS[agentName] || "🤖",
-        title,
-        content,
-        state: "open",
-        position: options?.position || getStaggeredPosition(windows.length),
-        size: options?.size || { width: 420, height: 320 },
-        zIndex: zIndexCounter.current,
-        pinned: options?.pinned || false,
-        createdAt: new Date(),
-      };
-
-      setWindows((prev) => [...prev, newWindow]);
-      setActiveWindowId(id);
-      return id;
-    },
-    [windows.length]
-  );
-
   const closeWindow = useCallback((id: WindowId) => {
     setWindows((prev) => prev.filter((w) => w.id !== id));
     setActiveWindowId((prev) => (prev === id ? null : prev));
@@ -132,6 +101,53 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     );
     setActiveWindowId(id);
   }, []);
+
+  const spawnWindow = useCallback(
+    (
+      agentName: string,
+      title: string,
+      content: React.ReactNode,
+      options?: Partial<Pick<AgentWindow, "agentIcon" | "size" | "position" | "pinned">>
+    ): WindowId => {
+      // Singleton + Toggle: check if a window with this agentName already exists
+      const existing = windows.find((w) => w.agentName === agentName);
+
+      if (existing) {
+        if (existing.state === "open") {
+          // Already open and visible → minimize it (toggle off)
+          minimizeWindow(existing.id);
+          return existing.id;
+        } else {
+          // Minimized → restore and focus it (toggle on)
+          restoreWindow(existing.id);
+          return existing.id;
+        }
+      }
+
+      // No existing window → create a new one
+      const id = `win-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      zIndexCounter.current += 1;
+
+      const newWindow: AgentWindow = {
+        id,
+        agentName,
+        agentIcon: options?.agentIcon || AGENT_ICONS[agentName] || "🤖",
+        title,
+        content,
+        state: "open",
+        position: options?.position || getStaggeredPosition(windows.length),
+        size: options?.size || { width: 420, height: 320 },
+        zIndex: zIndexCounter.current,
+        pinned: options?.pinned || false,
+        createdAt: new Date(),
+      };
+
+      setWindows((prev) => [...prev, newWindow]);
+      setActiveWindowId(id);
+      return id;
+    },
+    [windows, minimizeWindow, restoreWindow]
+  );
 
   const moveWindow = useCallback((id: WindowId, position: { x: number; y: number }) => {
     setWindows((prev) =>

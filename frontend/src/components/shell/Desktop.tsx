@@ -5,7 +5,7 @@ import FloatingWindow from "./FloatingWindow";
 import Dock from "./Dock";
 import CommandPalette from "./CommandPalette";
 
-export default function Desktop() {
+export default function Desktop({ onToggleAppGrid }: { onToggleAppGrid?: () => void }) {
   const { windows } = useWindowManager();
 
   return (
@@ -45,7 +45,7 @@ export default function Desktop() {
       ))}
 
       {/* Bottom dock (minimized windows) */}
-      <Dock />
+      <Dock onToggleAppGrid={onToggleAppGrid} />
 
       {/* Command palette / chat input */}
       <CommandPalette />

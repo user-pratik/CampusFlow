@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "../ThemeProvider";
 import { useWindowManager } from "@/lib/windowManager";
+import { useTimetableAgent } from "./TimetableAgentWindow";
+import { useAttendanceRiskAgent } from "./AttendanceRiskAgentWindow";
+import { useGPAAgent } from "./GPAAgentWindow";
 
 interface TopBarProps {
   agentCount: number;
@@ -18,6 +21,9 @@ interface TopBarProps {
 export default function TopBar({ agentCount, notificationCount, onNotificationClick, onSyncClick, syncStatus, onLaunchEmail, onLaunchWhatsApp, onLaunchMarks }: TopBarProps) {
   const { theme, toggle } = useTheme();
   const { windows } = useWindowManager();
+  const { spawn: spawnTimetable } = useTimetableAgent();
+  const { checkAndSpawn: spawnAttendance } = useAttendanceRiskAgent();
+  const { spawn: spawnGPA } = useGPAAgent();
   const [clock, setClock] = useState("");
   const [dateStr, setDateStr] = useState("");
 
@@ -60,9 +66,42 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
         </span>
       </div>
 
-      {/* Right: System tray icons */}
+      {/* Right: Academic tools + Notification + Sync */}
       <div className="flex items-center gap-1">
-        {/* Sync indicator (subtle) */}
+        {/* Attendance */}
+        <button
+          onClick={spawnAttendance}
+          className="p-1.5 rounded hover:bg-white/10 transition-colors"
+          title="Attendance Tracker"
+        >
+          <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        {/* Today's Schedule */}
+        <button
+          onClick={() => spawnTimetable("today")}
+          className="p-1.5 rounded hover:bg-white/10 transition-colors"
+          title="Today's Schedule"
+        >
+          <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          </svg>
+        </button>
+
+        {/* GPA Estimator */}
+        <button
+          onClick={spawnGPA}
+          className="p-1.5 rounded hover:bg-white/10 transition-colors"
+          title="GPA Estimator"
+        >
+          <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+          </svg>
+        </button>
+
+        {/* Sync indicator */}
         <button
           onClick={onSyncClick}
           disabled={syncStatus === "syncing"}
@@ -73,20 +112,6 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
-
-        {/* Wifi / Network icon */}
-        <div className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-default">
-          <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0" />
-          </svg>
-        </div>
-
-        {/* Volume icon */}
-        <div className="p-1.5 rounded hover:bg-white/10 transition-colors cursor-default">
-          <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-          </svg>
-        </div>
 
         {/* Notification bell */}
         <button
@@ -102,7 +127,7 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
           )}
         </button>
 
-        {/* Power / user icon */}
+        {/* Theme toggle (power icon position) */}
         <button
           onClick={toggle}
           className="p-1.5 rounded hover:bg-white/10 transition-colors"
