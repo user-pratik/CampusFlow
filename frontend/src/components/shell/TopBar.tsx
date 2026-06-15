@@ -52,10 +52,10 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
 
   return (
     <header className="h-8 bg-zinc-950 flex items-center justify-between px-4 shrink-0 select-none z-50 relative">
-      {/* Left: Activities */}
+      {/* Left: Brand */}
       <div className="flex items-center gap-3">
-        <span className="text-[13px] font-medium text-white/90 hover:bg-white/10 px-2 py-0.5 rounded cursor-default transition-colors">
-          Activities
+        <span className="text-[13px] font-bold text-white/90 hover:bg-white/10 px-2 py-0.5 rounded cursor-default transition-colors">
+          CampusFlow
         </span>
       </div>
 
@@ -113,7 +113,7 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
           </svg>
         </button>
 
-        {/* Notification bell */}
+        {/* Notification bell with blinking alert LED */}
         <button
           onClick={onNotificationClick}
           className="relative p-1.5 rounded hover:bg-white/10 transition-colors"
@@ -122,9 +122,10 @@ export default function TopBar({ agentCount, notificationCount, onNotificationCl
           <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          {notificationCount > 0 && (
-            <span className="absolute top-0 right-0 w-2 h-2 bg-blue-400 rounded-full" />
-          )}
+          <span className="absolute top-0 right-0 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+          </span>
         </button>
 
         {/* Theme toggle (power icon position) */}

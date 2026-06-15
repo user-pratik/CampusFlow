@@ -700,6 +700,9 @@ CRITICAL RULES:
 - If asked about WhatsApp groups/messages and no data is provided, say: "Let me check your WhatsApp messages" and suggest asking again so I can route to the correct agent.
 - If asked about emails, attendance, marks -- say "Let me look that up" and suggest a specific query.
 - Do NOT use profile interests to guess/invent group names or email subjects.
+- Be strictly accurate with grades, numbers, and math. Think step-by-step before any calculation.
+- Never hallucinate grades or scores. If data is not provided, say so.
+- If the user provides a number, treat it as absolute fact and do not contradict it.
 
 CONVERSATION HISTORY:
 {history_text}"""

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWindowManager } from "@/lib/windowManager";
 import { chatBus } from "@/lib/chatBus";
+import ReactMarkdown from "react-markdown";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -141,7 +142,27 @@ function ChatWindowContent({ initialMessage }: ChatWindowContentProps) {
                   : "bg-chat-ai border border-border text-foreground"
               }`}
             >
-              <p className="text-[11px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+              <div className="text-[11px] leading-relaxed prose-chat">
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+                    strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-1.5 space-y-0.5">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-1.5 space-y-0.5">{children}</ol>,
+                    li: ({ children }) => <li className="ml-1">{children}</li>,
+                    code: ({ children }) => <code className="bg-white/10 px-1 py-0.5 rounded text-[10px] font-mono">{children}</code>,
+                    pre: ({ children }) => <pre className="bg-white/5 border border-white/10 rounded-md p-2 overflow-x-auto text-[10px] my-1.5">{children}</pre>,
+                    h1: ({ children }) => <h1 className="text-sm font-bold mb-1">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-xs font-bold mb-1">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-xs font-semibold mb-0.5">{children}</h3>,
+                    a: ({ children, href }) => <a href={href} className="text-accent underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                    blockquote: ({ children }) => <blockquote className="border-l-2 border-accent/50 pl-2 italic opacity-80 my-1">{children}</blockquote>,
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              </div>
 
               {/* Suggested actions */}
               {msg.actions && msg.actions.length > 0 && (
